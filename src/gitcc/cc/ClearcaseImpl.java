@@ -25,7 +25,7 @@ import com.ibm.rational.clearcase.remote_core.cmds.CmdProgress;
 import com.ibm.rational.clearcase.remote_core.cmds.Compare;
 import com.ibm.rational.clearcase.remote_core.cmds.IVectoredFileCmdListener;
 import com.ibm.rational.clearcase.remote_core.cmds.MaterializedVersion;
-import com.ibm.rational.clearcase.remote_core.cmds.MkelemFast;
+import com.ibm.rational.clearcase.remote_core.cmds.Mkelem;
 import com.ibm.rational.clearcase.remote_core.cmds.Mv;
 import com.ibm.rational.clearcase.remote_core.cmds.Rmname;
 import com.ibm.rational.clearcase.remote_core.cmds.Uncheckout;
@@ -169,8 +169,8 @@ public class ClearcaseImpl implements Clearcase {
 	}
 
 	private void mkelem(String file, String type) {
-		run(new MkelemFast(session, log(IVectoredFileCmdListener.class), null,
-				(String) null, type, copyFile(file)));
+		run(new Mkelem(session, log(IVectoredFileCmdListener.class), null,
+				(String) null, type == null, type, singleFile(file)));
 	}
 
 	@Override
