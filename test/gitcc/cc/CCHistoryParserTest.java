@@ -24,7 +24,7 @@ public class CCHistoryParserTest extends TestCase {
 		CCCommit first = commits.iterator().next();
 		assertEquals("charleso", first.getAuthor());
 		assertEquals("Ellipse build for everything", first.getMessage());
-		assertEquals(1244089636000l, first.getDate().getTime());
+		assertEquals(1244125636000l, first.getDate().getTime());
 		List<CCFile> files = first.getFiles();
 		assertEquals(1, files.size());
 		CCFile file = files.get(0);

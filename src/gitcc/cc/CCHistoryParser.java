@@ -77,6 +77,7 @@ public class CCHistoryParser {
 			CCCommit next = i.next();
 			if (last != null && equals(last, next)) {
 				last.getFiles().add(next.getFiles().get(0));
+				last.setDate(next.getDate());
 				i.remove();
 			} else {
 				last = next;
