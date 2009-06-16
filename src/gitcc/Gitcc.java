@@ -30,7 +30,6 @@ public class Gitcc {
 		Command command = getCommand(type);
 
 		Config config = command.config = new Config();
-		config.setGroup(System.getenv("CLEARCASE_PRIMARY_GROUP"));
 		Log.setDebug(config.isDebug());
 		Git git = command.git = new GitImpl(findGitRoot(), config);
 		config.setBranch(git.getBranch());

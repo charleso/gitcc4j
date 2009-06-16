@@ -42,6 +42,8 @@ public class ConfigParser {
 				config.setPassword(value);
 			else if ("suffix".equals(name))
 				config.setSuffix(value);
+			else if ("group".equals(name))
+				config.setGroup(value);
 		} else {
 			if (mode.equals(config._getBranch())) {
 				if ("clearcase".equals(name))
