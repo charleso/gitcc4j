@@ -88,8 +88,8 @@ public class Transaction extends Common {
 		for (FileStatus s : statuses) {
 			switch (s.getStatus()) {
 			case Added:
-				cc.add(s.getFile());
 				write(s);
+				cc.add(s.getFile());
 				break;
 			case Deleted:
 				cc.delete(s.getFile());
