@@ -5,5 +5,5 @@ CP=$CP:$CC_TEAM_API/remote_core.jar
 CP=$CP:$CC_TEAM_API/stpwvcm.jar
 CP=$CP:$CC_TEAM_API/commons-httpclient-3.0.jar
 CP=$CP:$CC_TEAM_API/commons-logging-1.0.4.jar
-CP=$CP:$TEAM_API/commons-codec-1.3.jar
+CP=$CP:$CC_TEAM_API/commons-codec-1.3.jar
 java -classpath $CP gitcc.Gitcc $@
