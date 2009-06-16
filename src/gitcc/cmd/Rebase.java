@@ -3,8 +3,11 @@ package gitcc.cmd;
 import gitcc.cc.CCCommit;
 import gitcc.cc.CCFile;
 import gitcc.cc.CCFile.Status;
+import gitcc.util.IOUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +35,7 @@ public class Rebase extends Command {
 		git.tag(config.getCI(), "HEAD");
 	}
 
-	private void handleFiles(List<CCFile> files) {
+	private void handleFiles(List<CCFile> files) throws Exception {
 		for (CCFile f : files) {
 			if (f.getStatus() == Status.Directory) {
 				handleFiles(cc.diffPred(f));
@@ -44,7 +47,7 @@ public class Rebase extends Command {
 		}
 	}
 
-	private void add(CCFile f) {
+	private void add(CCFile f) throws Exception {
 		// TODO Full renames
 		if (f.getVersion().getFullVersion().length() == 0) {
 			System.out.println("IGNORED file: " + f);
@@ -56,8 +59,12 @@ public class Rebase extends Command {
 			throw new RuntimeException("Could not delete file: " + dest);
 		dest.getParentFile().mkdirs();
 		if (!newFile.renameTo(dest)) {
-			newFile.delete();
-			throw new RuntimeException("Could not get " + dest);
+			try {
+				IOUtils.copy(new FileInputStream(newFile),
+						new FileOutputStream(dest));
+			} finally {
+				newFile.delete();
+			}
 		}
 		git.add(f.getFile());
 	}
