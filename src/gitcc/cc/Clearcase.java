@@ -40,4 +40,6 @@ public interface Clearcase {
 	boolean exists(String path);
 
 	void write(String file, byte[] bytes);
+
+	File toFile(String file);
 }

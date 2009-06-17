@@ -114,4 +114,19 @@ public class GitImpl extends Exec implements Git {
 	public void checkout(String branch) {
 		exec("checkout", branch);
 	}
+
+	@Override
+	public String getBlob(String file, String sha) {
+		return exec("ls-tree", "-z", sha, file).split(" ")[2].split("\t")[0];
+	}
+
+	@Override
+	public String hashObject(String file) {
+		return exec("hash-object", file);
+	}
+
+	@Override
+	public String mergeBase(String commit1, String commit2) {
+		return exec("merge-base", commit1, commit2);
+	}
 }

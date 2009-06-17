@@ -19,6 +19,7 @@ public class Transaction extends Common {
 	private final String commit;
 	private final List<FileStatus> statuses;
 	private String activity;
+	private String mergeBase;
 
 	public Transaction(GitCommit commit, List<FileStatus> statuses) {
 		this.id = commit.getId();
@@ -28,6 +29,7 @@ public class Transaction extends Common {
 
 	public void process() {
 		activity = cc.mkact(GitCommit.getSubject(commit));
+		mergeBase = git.mergeBase(config.getCI(), "HEAD");
 		try {
 			phase1();
 			mkdirs();
@@ -50,22 +52,34 @@ public class Transaction extends Common {
 				stageDir(file);
 				break;
 			case Renamed:
-				checkout(s.getOldFile());
+				stage(s.getOldFile());
 				stageDir(s.getOldFile());
 				stageDir(file);
 				break;
 			case Modified:
-				checkout(s.getFile());
+				stage(s.getFile());
 				break;
 			}
 		}
 	}
 
-	private void checkout(String oldFile) {
+	private void stage(String file) {
+		if (checkout(file)) {
+			String hash = git.hashObject(cc.toFile(file).getAbsolutePath());
+			String blob = git.getBlob(file, mergeBase);
+			if (!hash.equals(blob)) {
+				String s = "File has been modified: %s. Try rebasing.";
+				throw new RuntimeException(String.format(s, file));
+			}
+		}
+	}
+
+	private boolean checkout(String oldFile) {
 		if (checkouts.contains(oldFile))
-			return;
+			return false;
 		cc.checkout(oldFile);
 		checkouts.add(oldFile);
+		return true;
 	}
 
 	private void stageDir(String f) {

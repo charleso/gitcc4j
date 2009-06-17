@@ -65,7 +65,7 @@ public class Exec {
 	}
 
 	public String exec(String[] env, String... args) {
-		return new String(_exec(env, args));
+		return new String(_exec(env, args)).trim();
 	}
 
 	public String exec(String... args) {

@@ -36,4 +36,9 @@ public interface Git {
 
 	void checkout(String branch);
 
+	String mergeBase(String commit1, String commit2);
+
+	String hashObject(String file);
+
+	String getBlob(String file, String mergeBase);
 }

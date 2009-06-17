@@ -91,6 +91,10 @@ public class ClearcaseImpl implements Clearcase {
 		return new CopyAreaFile(root, extraPath + file);
 	}
 
+	public File toFile(String file) {
+		return copyFile(file);
+	}
+
 	protected void run(AbstractCmd update) {
 		update.run();
 	}
