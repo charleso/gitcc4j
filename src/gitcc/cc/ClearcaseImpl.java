@@ -156,20 +156,20 @@ public class ClearcaseImpl implements Clearcase {
 	}
 
 	@Override
-	public void add(String file) {
+	public void add(String file, String comment) {
 		debug("mkelem " + file);
-		mkelem(file, null);
+		mkelem(file, null, comment);
 	}
 
 	@Override
 	public void mkdir(String dir) {
 		debug("mkelem -eltype directory " + dir);
 		copyFile(dir).mkdirs();
-		mkelem(dir, "directory");
+		mkelem(dir, "directory", null);
 	}
 
-	private void mkelem(String file, String type) {
-		run(new Mkelem(session, log(IVectoredFileCmdListener.class), null,
+	private void mkelem(String file, String type, String comment) {
+		run(new Mkelem(session, log(IVectoredFileCmdListener.class), comment,
 				(String) null, type == null, type, singleFile(file)));
 	}
 

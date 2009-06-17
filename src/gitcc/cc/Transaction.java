@@ -89,7 +89,7 @@ public class Transaction extends Common {
 			switch (s.getStatus()) {
 			case Added:
 				write(s);
-				cc.add(s.getFile());
+				cc.add(s.getFile(), commit);
 				break;
 			case Deleted:
 				cc.delete(s.getFile());

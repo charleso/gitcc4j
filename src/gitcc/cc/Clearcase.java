@@ -27,7 +27,7 @@ public interface Clearcase {
 
 	void delete(String file);
 
-	void add(String file);
+	void add(String file, String message);
 
 	void mkdir(String dir);
 

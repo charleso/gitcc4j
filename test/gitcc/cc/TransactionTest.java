@@ -35,7 +35,7 @@ public class TransactionTest extends TestCase {
 		cc.checkout("m");
 		cc.checkout("r1");
 		write(git, cc, "a");
-		cc.add("a");
+		cc.add("a", message);
 		cc.delete("d");
 		write(git, cc, "m");
 		cc.move("r1", "r2");
