@@ -16,7 +16,7 @@ public interface Git {
 
 	String getBranch();
 
-	void rebaseOnto(String newbase, String upstream, String branch);
+	void rebase(String upstream, String branch);
 
 	List<GitCommit> log(String treeish);
 
@@ -31,5 +31,7 @@ public interface Git {
 	void branch(String branch);
 
 	void tag(String tag, String id);
+
+	void checkout(String branch);
 
 }

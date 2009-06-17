@@ -59,8 +59,8 @@ public class GitImpl extends Exec implements Git {
 	}
 
 	@Override
-	public void rebaseOnto(String newbase, String upstream, String branch) {
-		exec("rebase", "--onto", newbase, upstream, branch);
+	public void rebase(String upstream, String branch) {
+		exec("rebase", upstream, branch);
 	}
 
 	@Override
@@ -103,5 +103,10 @@ public class GitImpl extends Exec implements Git {
 	@Override
 	public void tag(String tag, String id) {
 		exec("tag", "-f", tag, id);
+	}
+
+	@Override
+	public void checkout(String branch) {
+		exec("checkout", branch);
 	}
 }

@@ -24,15 +24,19 @@ public class Rebase extends Command {
 		if (commits.isEmpty())
 			return;
 		// TODO Git fast import
+		if (normal)
+			git.checkout(config.getCC());
 		for (CCCommit c : commits) {
 			handleFiles(c.getFiles());
 			git.commit(c);
 		}
 		if (normal) {
-			git.rebaseOnto(config.getCC(), config.getCI(), branch);
+			git.rebase(config.getCI(), config.getCC());
+			git.rebase(config.getCC(), branch);
+		} else {
+			git.branch(config.getCC());
 		}
-		git.branch(config.getCC());
-		git.tag(config.getCI(), "HEAD");
+		git.tag(config.getCI(), config.getCC());
 	}
 
 	private void handleFiles(List<CCFile> files) throws Exception {
