@@ -11,7 +11,7 @@ public class GitUtil {
 	public List<GitCommit> parseLog(String result) {
 		List<GitCommit> log = new ArrayList<GitCommit>();
 		for (String line : result.split("\0")) {
-			if(line.length() == 0)
+			if (line.length() == 0)
 				break;
 			log.add(_parseLog(line));
 		}
@@ -32,6 +32,8 @@ public class GitUtil {
 
 	public List<FileStatus> parseDiff(String result) {
 		List<FileStatus> log = new ArrayList<FileStatus>();
+		if (result.isEmpty())
+			return log;
 		String[] split = result.split("\0");
 		for (int i = 0; i < split.length; i++) {
 			String type = split[i];

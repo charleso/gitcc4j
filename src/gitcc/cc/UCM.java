@@ -3,14 +3,21 @@ package gitcc.cc;
 import gitcc.Log;
 import gitcc.config.Config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.ibm.rational.clearcase.remote_core.cmds.CreateActivity;
+import com.ibm.rational.clearcase.remote_core.cmds.GetMyActivities;
+import com.ibm.rational.clearcase.remote_core.cmds.SetCurrentActivity;
 import com.ibm.rational.clearcase.remote_core.cmds.properties.GetActivityProperties;
 import com.ibm.rational.clearcase.remote_core.integration.DeliverStream;
-import com.ibm.rational.clearcase.remote_core.integration.PrepareRebase;
 import com.ibm.rational.clearcase.remote_core.integration.RebaseStream;
+import com.ibm.rational.clearcase.remote_core.server_entities.description.ICommonActivity;
 import com.ibm.rational.clearcase.remote_core.server_entities.description.IHeadlinedUcmActivity;
 
 public class UCM extends ClearcaseImpl {
+
+	private final Map<String, String> activities = new HashMap<String, String>();
 
 	public UCM(Config config) {
 		super(config);
@@ -43,10 +50,6 @@ public class UCM extends ClearcaseImpl {
 
 	@Override
 	public void rebase() {
-		if (false) { // TODO DO we need this?
-			run(new PrepareRebase(session, copyArea,
-					log(PrepareRebase.Listener.class)));
-		}
 		boolean complete = _rebase(RebaseStream.OperationType.REBASE_START);
 		if (complete) {
 			_rebase(RebaseStream.OperationType.REBASE_COMPLETE);
@@ -74,16 +77,31 @@ public class UCM extends ClearcaseImpl {
 	}
 
 	@Override
-	public String mkact(String message) {
-		final String[] activity = new String[1];
-		run(new CreateActivity(session, copyArea, message, message, message,
-				new CreateActivity.Listener() {
-					@Override
-					public void newActivity(IHeadlinedUcmActivity act) {
-						activity[0] = act.getId();
-					}
-				}));
-		return activity[0];
+	public String mkact(final String message) {
+		if (activities.isEmpty()) {
+			run(new GetMyActivities(session, copyArea, log(
+					GetMyActivities.Listener.class, new Object() {
+						@SuppressWarnings("unused")
+						public void nextActivity(ICommonActivity act,
+								String[] as) {
+							activities.put(act.getHeadline(), act.toSelector());
+						}
+					})));
+		}
+		final String[] id = new String[] { activities.get(message) };
+		if (id[0] == null) {
+			run(new CreateActivity(session, copyArea, message, null, null,
+					new CreateActivity.Listener() {
+						@Override
+						public void newActivity(IHeadlinedUcmActivity activity) {
+							activities.put(id[0] = activity.getId(), message);
+						}
+					}));
+		} else {
+			run(new SetCurrentActivity(session, id[0], copyArea,
+					log(SetCurrentActivity.Listener.class)));
+		}
+		return id[0];
 	}
 
 	@Override
@@ -92,15 +110,12 @@ public class UCM extends ClearcaseImpl {
 	}
 
 	public void deliver() {
-		boolean complete = _deliver(DeliverStream.OperationType.DELIVER_START);
-		if (complete) {
-			_deliver(DeliverStream.OperationType.DELIVER_START);
-		}
+		_deliver(DeliverStream.OperationType.DELIVER_START);
+		_deliver(DeliverStream.OperationType.DELIVER_COMPLETE);
 	}
 
-	private boolean _deliver(DeliverStream.OperationType type) {
+	private void _deliver(DeliverStream.OperationType type) {
 		run(new DeliverStream(type, session, log(DeliverStream.UI.class),
 				copyArea, "", null));
-		return false; // TODO
 	}
 }

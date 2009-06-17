@@ -147,7 +147,7 @@ public class ClearcaseImpl implements Clearcase {
 
 	@Override
 	public String mkact(String message) {
-		return null;
+		return message;
 	}
 
 	@Override
@@ -310,7 +310,7 @@ public class ClearcaseImpl implements Clearcase {
 				throws Throwable {
 			if (args == null)
 				args = new String[0];
-			if (m.getName().equals("runComplete") && args.length > 0) {
+			if (m.getName().equals("runComplete") && args.length == 1) {
 				Status status = (Status) args[0];
 				if (!status.isOk())
 					throw new RuntimeException(status.getMsg());
