@@ -11,6 +11,8 @@ public class GitUtil {
 	public List<GitCommit> parseLog(String result) {
 		List<GitCommit> log = new ArrayList<GitCommit>();
 		for (String line : result.split("\0")) {
+			if(line.length() == 0)
+				break;
 			log.add(_parseLog(line));
 		}
 		return log;

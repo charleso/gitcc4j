@@ -1,15 +1,20 @@
 package gitcc.cc;
 
-import java.util.List;
-
 import gitcc.git.FileStatus;
 import gitcc.git.GitCommit;
 import gitcc.git.GitUtil;
+
+import java.util.List;
+
 import junit.framework.TestCase;
 
 public class GitUtilTest extends TestCase {
 
 	private GitUtil util = new GitUtil();
+
+	public void testParseLogEmpty() {
+		assertTrue(util.parseLog("").isEmpty());
+	}
 
 	public void testParseLog() {
 		String e = "abc\1Snapshot\n\0def\1Cooking\n\0ghi\1Initial";
