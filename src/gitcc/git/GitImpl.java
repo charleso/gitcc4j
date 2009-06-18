@@ -12,7 +12,7 @@ import java.util.List;
 
 public class GitImpl extends Exec implements Git {
 
-	private static final String ISO_DATE = "yyyy-MM-dd'T'HH:mm:ssz";
+	private static final String ISO_DATE = "yyyy-MM-dd'T'HH:mm:ss";
 	private static final String LOG_FORMAT = "%H%x01%s%n%b";
 
 	private final GitUtil util = new GitUtil();
