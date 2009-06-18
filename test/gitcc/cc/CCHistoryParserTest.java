@@ -6,12 +6,14 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.List;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
 public class CCHistoryParserTest extends TestCase {
 
 	public void test() throws Exception {
+		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 		StringBuilder b = new StringBuilder();
 		BufferedReader in = new BufferedReader(new InputStreamReader(getClass()
 				.getResourceAsStream("lshistory.example")));
