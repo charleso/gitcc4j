@@ -6,6 +6,7 @@ import gitcc.git.Git;
 import gitcc.git.GitCommit;
 import gitcc.git.FileStatus.Status;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,40 +17,86 @@ import org.easymock.IMocksControl;
 
 public class TransactionTest extends TestCase {
 
-	public void test() {
+	private Clearcase cc;
+	private Git git;
+	private Config config;
+	private String message = "x\ny";
+	private IMocksControl ctrl;
+	private Transaction t;
+
+	private void setup(List<FileStatus> statuses) {
 		GitCommit commit = new GitCommit();
 		commit.setId("sha");
-		String message = "x\ny";
 		commit.setMessage(message);
-		List<FileStatus> statuses = Arrays.asList(f("a", Status.Added), f("d",
-				Status.Deleted), f("m", Status.Modified), new FileStatus("r2",
-				Status.Renamed, "r1"));
-		Transaction t = new Transaction(commit, statuses);
-		IMocksControl ctrl = EasyMock.createStrictControl();
-		Clearcase cc = t.cc = ctrl.createMock(Clearcase.class);
-		Git git = t.git = ctrl.createMock(Git.class);
-		Config config = t.config = new Config();
+		t = new Transaction(commit, statuses);
+		ctrl = EasyMock.createStrictControl();
+		cc = t.cc = ctrl.createMock(Clearcase.class);
+		git = t.git = ctrl.createMock(Git.class);
+		config = t.config = new Config();
 		config.setBranch("my_branch");
 		EasyMock.expect(cc.mkact("x")).andReturn("act");
+		EasyMock.expect(git.mergeBase("my_branch_ci", "HEAD"))
+				.andReturn("base");
+	}
+
+	private void process() {
+		ctrl.replay();
+		try {
+			t.process();
+		} finally {
+			ctrl.verify();
+		}
+	}
+
+	public void test() {
+		setup(Arrays.asList(f("a", Status.Added), f("d", Status.Deleted), f(
+				"m", Status.Modified), new FileStatus("r2", Status.Renamed,
+				"r1")));
 		cc.checkout(".");
 		cc.checkout("m");
+		stage("m");
 		cc.checkout("r1");
-		write(git, cc, "a");
+		stage("r1");
+		write("a");
 		cc.add("a", message);
 		cc.delete("d");
-		write(git, cc, "m");
+		write("m");
 		cc.move("r1", "r2");
-		write(git, cc, "r2");
+		write("r2");
 		cc.checkin(".", message);
 		cc.checkin("m", message);
 		cc.checkin("r2", message);
 		git.tag("my_branch_ci", "sha");
-		ctrl.replay();
-		t.process();
-		ctrl.verify();
+		process();
 	}
 
-	private void write(Git git, Clearcase cc, String a) {
+	public void testFail() {
+		setup(Arrays.asList(f("m", Status.Modified)));
+		cc.checkout("m");
+		stage("m", "a", "b");
+		cc.uncheckout("m");
+		cc.rmact("act");
+		try {
+			process();
+			fail();
+		} catch (RuntimeException e) {
+			assertEquals("File has been modified: m. Try rebasing.", e
+					.getMessage());
+		}
+	}
+
+	private void stage(String file) {
+		String hash = "hash";
+		stage(file, hash, hash);
+	}
+
+	private void stage(String file, String hash1, String hash2) {
+		EasyMock.expect(cc.toFile(file)).andReturn(new File("/" + file));
+		EasyMock.expect(git.hashObject("/" + file)).andReturn(hash1);
+		EasyMock.expect(git.getBlob(file, "base")).andReturn(hash2);
+	}
+
+	private void write(String a) {
 		EasyMock.expect(git.catFile("sha", a)).andReturn(null);
 		cc.write(a, null);
 	}
