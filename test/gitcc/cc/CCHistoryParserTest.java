@@ -19,8 +19,8 @@ public class CCHistoryParserTest extends TestCase {
 			b.append(line).append("\n");
 		String s = b.toString();
 		Collection<CCCommit> commits = parse(s, 6, "charleso_dev");
-		parse(s, 2, "dev_int");
-		parse(s, 41, "charleso_dev", "dev_int");
+		parse(s, 3, "dev_int");
+		parse(s, 43, "charleso_dev", "dev_int");
 		CCCommit first = commits.iterator().next();
 		assertEquals("charleso", first.getAuthor());
 		assertEquals("Ellipse build for everything", first.getMessage());

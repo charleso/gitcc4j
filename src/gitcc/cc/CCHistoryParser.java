@@ -94,7 +94,8 @@ public class CCHistoryParser {
 	private final class CommitComparator implements Comparator<CCCommit> {
 		@Override
 		public int compare(CCCommit o1, CCCommit o2) {
-			return o1.getDate().compareTo(o2.getDate());
+			int i = o1.getDate().compareTo(o2.getDate());
+			return i != 0 ? i : -1;
 		}
 	}
 }
