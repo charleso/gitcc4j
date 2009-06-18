@@ -53,9 +53,7 @@ public class TransactionTest extends TestCase {
 				"m", Status.Modified), new FileStatus("r2", Status.Renamed,
 				"r1")));
 		cc.checkout(".");
-		cc.checkout("m");
 		stage("m");
-		cc.checkout("r1");
 		stage("r1");
 		write("a");
 		cc.add("a", message);
@@ -72,7 +70,6 @@ public class TransactionTest extends TestCase {
 
 	public void testFail() {
 		setup(Arrays.asList(f("m", Status.Modified)));
-		cc.checkout("m");
 		stage("m", "a", "b");
 		cc.uncheckout("m");
 		cc.rmact("act");
@@ -91,6 +88,7 @@ public class TransactionTest extends TestCase {
 	}
 
 	private void stage(String file, String hash1, String hash2) {
+		cc.checkout(file);
 		EasyMock.expect(cc.toFile(file)).andReturn(new File("/" + file));
 		EasyMock.expect(git.hashObject("/" + file)).andReturn(hash1);
 		EasyMock.expect(git.getBlob(file, "base")).andReturn(hash2);
