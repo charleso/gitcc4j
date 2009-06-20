@@ -7,7 +7,9 @@ import gitcc.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -53,12 +55,26 @@ public class Rebase extends Command {
 	}
 
 	private void add(List<CCFile> all, CCFile f) throws Exception {
-		if (!f.hasVersion()) {
-			handleRename(all, f);
-			return;
+		File newFile = getFile(all, f);
+		if (newFile != null) {
+			File dest = new File(git.getRoot(), f.getFile());
+			copyFile(newFile, dest);
+			git.add(f.getFile());
 		}
-		File newFile = cc.get(f);
-		File dest = new File(git.getRoot(), f.getFile());
+	}
+
+	private File getFile(List<CCFile> all, CCFile f) {
+		File newFile;
+		if (!f.hasVersion()) {
+			newFile = handleRename(all, f);
+		} else {
+			newFile = cc.get(f);
+		}
+		return newFile;
+	}
+
+	private void copyFile(File newFile, File dest) throws IOException,
+			FileNotFoundException {
 		if (dest.exists() && !dest.delete())
 			throw new RuntimeException("Could not delete file: " + dest);
 		dest.getParentFile().mkdirs();
@@ -70,7 +86,6 @@ public class Rebase extends Command {
 				newFile.delete();
 			}
 		}
-		git.add(f.getFile());
 	}
 
 	private void remove(CCFile f) {
@@ -78,13 +93,18 @@ public class Rebase extends Command {
 			git.remove(f.getFile());
 	}
 
-	// TODO Full renames
-	private void handleRename(List<CCFile> all, CCFile f) {
+	private File handleRename(List<CCFile> all, CCFile f) {
 		for (CCFile file : all) {
 			if (file.getFile().equals(f.getFile())) {
-				return;
+				return null;
 			}
 		}
-		System.out.println("IGNORED file: " + f);
+
+		// This is the lazy approach, but 9 times out of 10 it'll be fine.
+		// The probably is that the git history will have a slight anomaly.
+		// The important thing is that the working tree will be correct by the
+		// end of this rebase.
+		File newFile = cc.toFile(f.getFile());
+		return newFile.exists() ? newFile : null;
 	}
 }
