@@ -50,6 +50,10 @@ public class ConfigParser {
 					config.setClearcase(value);
 				else if ("branches".equals(name))
 					config.setBranches(value.split(SEP));
+				else if ("integration".equals(name))
+					config.setIntegration(value);
+				else if ("stream".equals(name))
+					config.setStream(value);
 			}
 		}
 	}

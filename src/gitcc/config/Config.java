@@ -15,6 +15,8 @@ public class Config {
 	private String username;
 	private String password;
 	private String group;
+	private String integration;
+	private String stream;
 
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
@@ -114,5 +116,21 @@ public class Config {
 
 	public String getGroup() {
 		return group;
+	}
+
+	public String getIntegration() {
+		return integration;
+	}
+
+	public void setIntegration(String integration) {
+		this.integration = integration;
+	}
+
+	public String getStream() {
+		return stream;
+	}
+
+	public void setStream(String stream) {
+		this.stream = stream;
 	}
 }

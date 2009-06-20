@@ -63,7 +63,7 @@ public class Gitcc {
 		return dir;
 	}
 
-	private static Clearcase createClearcase(Config config) {
+	private static Clearcase createClearcase(Config config) throws Exception {
 		if (config.isUCM()) {
 			return new UCM(config);
 		} else {

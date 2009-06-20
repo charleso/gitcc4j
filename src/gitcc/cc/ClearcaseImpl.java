@@ -5,9 +5,6 @@ import gitcc.config.Config;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,7 +14,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import com.ibm.rational.clearcase.remote_core.cmd.AbstractCmd;
 import com.ibm.rational.clearcase.remote_core.cmds.Checkin;
 import com.ibm.rational.clearcase.remote_core.cmds.Checkout;
 import com.ibm.rational.clearcase.remote_core.cmds.Cleartool;
@@ -40,10 +36,10 @@ import com.ibm.rational.clearcase.remote_core.copyarea.HijackTreatment;
 import com.ibm.rational.clearcase.remote_core.rpc.Session;
 import com.ibm.rational.clearcase.remote_core.util.Status;
 
-public class ClearcaseImpl implements Clearcase {
+public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 
 	private static final String LSH_FORMAT = "%o%m|%Nd|%u|%En|%Vn|";
-	private static final HijackTreatment HIJACK_TREATMENT = HijackTreatment.OVERWRITE;
+	protected static final HijackTreatment HIJACK_TREATMENT = HijackTreatment.OVERWRITE;
 	private static final CCHistoryParser histParser = new CCHistoryParser();
 	private static final String DATE_FORMAT = "dd-MMM-yyyy.HH:mm:ss";
 	private static final String RPC_PATH = "/TeamCcrc/ccrc/";
@@ -51,7 +47,6 @@ public class ClearcaseImpl implements Clearcase {
 	protected final Session session;
 	protected final CopyArea copyArea;
 
-	private final String configPath;
 	private final CopyArea root;
 	private final CopyAreaFile[] files;
 	private final String[] branches;
@@ -61,7 +56,7 @@ public class ClearcaseImpl implements Clearcase {
 		try {
 			String url = new URL(new URL(config.getUrl()), RPC_PATH).toString();
 			session = new Session(url, new Credentials(config));
-			configPath = config.getClearcase();
+			String configPath = config.getClearcase();
 			root = new CopyAreaFile(new File(configPath)).getCopyArea();
 			extraPath = configPath.substring(root.getRoot().length() + 1)
 					+ File.separatorChar;
@@ -93,10 +88,6 @@ public class ClearcaseImpl implements Clearcase {
 
 	public File toFile(String file) {
 		return copyFile(file);
-	}
-
-	protected void run(AbstractCmd update) {
-		update.run();
 	}
 
 	@Override
@@ -287,48 +278,8 @@ public class ClearcaseImpl implements Clearcase {
 		return copyFile(path).exists();
 	}
 
-	protected <T> T log(Class<T> c) {
-		return log(c, new Object());
-	}
-
-	@SuppressWarnings("unchecked")
-	protected <T> T log(Class<T> c, Object o) {
-		return (T) Proxy.newProxyInstance(getClass().getClassLoader(),
-				new Class[] { c }, new LogIH(o));
-	}
-
 	private void debug(String s) {
 		Log.debug("cleartool " + s);
-	}
-
-	private final class LogIH implements InvocationHandler {
-
-		private final Object object;
-
-		public LogIH(Object object) {
-			this.object = object;
-		}
-
-		@Override
-		public Object invoke(Object proxy, Method m, Object[] args)
-				throws Throwable {
-			if (args == null)
-				args = new String[0];
-			if (m.getName().equals("runComplete") && args.length == 1) {
-				Status status = (Status) args[0];
-				if (!status.isOk())
-					throw new RuntimeException(status.getMsg());
-				return null;
-			}
-			try {
-				return object.getClass().getDeclaredMethod(m.getName(),
-						m.getParameterTypes()).invoke(object, args);
-			} catch (NoSuchMethodException e) {
-				String line = m.getName() + "(" + Arrays.asList(args) + ")";
-				Log.debug(line);
-				return null;
-			}
-		}
 	}
 
 	protected final class UpdateListener extends UpdateListenerAdapter {

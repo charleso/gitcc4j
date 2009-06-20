@@ -10,7 +10,10 @@ import com.ibm.rational.clearcase.remote_core.cmds.CreateActivity;
 import com.ibm.rational.clearcase.remote_core.cmds.GetMyActivities;
 import com.ibm.rational.clearcase.remote_core.cmds.SetCurrentActivity;
 import com.ibm.rational.clearcase.remote_core.cmds.properties.GetActivityProperties;
+import com.ibm.rational.clearcase.remote_core.cmds.sync.Update;
+import com.ibm.rational.clearcase.remote_core.copyarea.CopyArea;
 import com.ibm.rational.clearcase.remote_core.integration.DeliverStream;
+import com.ibm.rational.clearcase.remote_core.integration.PrepareRebase;
 import com.ibm.rational.clearcase.remote_core.integration.RebaseStream;
 import com.ibm.rational.clearcase.remote_core.server_entities.description.ICommonActivity;
 import com.ibm.rational.clearcase.remote_core.server_entities.description.IHeadlinedUcmActivity;
@@ -19,8 +22,13 @@ public class UCM extends ClearcaseImpl {
 
 	private final Map<String, String> activities = new HashMap<String, String>();
 
-	public UCM(Config config) {
+	private CopyArea integeration;
+	private String stream;
+
+	public UCM(Config config) throws Exception {
 		super(config);
+		integeration = CopyArea.open(config.getIntegration());
+		stream = config.getStream();
 	}
 
 	@Override
@@ -50,30 +58,22 @@ public class UCM extends ClearcaseImpl {
 
 	@Override
 	public void rebase() {
-		boolean complete = _rebase(RebaseStream.OperationType.REBASE_START);
-		if (complete) {
+		run(new PrepareRebase(session, copyArea,
+				log(PrepareRebase.Listener.class)));
+		UI ui = _rebase(RebaseStream.OperationType.REBASE_START);
+		if (ui.inProgress()) {
+			ui = _rebase(RebaseStream.OperationType.REBASE_RESUME);
+		}
+		if (ui.isOk()) {
 			_rebase(RebaseStream.OperationType.REBASE_COMPLETE);
 		}
 	}
 
-	private boolean _rebase(RebaseStream.OperationType type) {
-		final int[] status = new int[1];
-		Object ui = new Object() {
-			@SuppressWarnings("unused")
-			public void statusNotify(int i, String s) {
-				Log.debug(s.trim());
-				status[i] = i;
-			}
-
-			@SuppressWarnings("unused")
-			public void configChangeNotify(String s) {
-				Log.debug(s.trim());
-			}
-		};
+	private UI _rebase(RebaseStream.OperationType type) {
+		UI ui = new UI();
 		run(new RebaseStream(type, session, log(RebaseStream.UI.class, ui),
 				new UpdateListener(), copyArea, null, false, true));
-		System.out.println("Rebase status " + status[0]);
-		return status[0] > 0;
+		return ui;
 	}
 
 	@Override
@@ -110,12 +110,38 @@ public class UCM extends ClearcaseImpl {
 	}
 
 	public void deliver() {
+		run(new Update(session, new UpdateListener(), integeration,
+				HIJACK_TREATMENT, false));
 		_deliver(DeliverStream.OperationType.DELIVER_START);
 		_deliver(DeliverStream.OperationType.DELIVER_COMPLETE);
+		new BaselineUtil(session, stream).run();
 	}
 
 	private void _deliver(DeliverStream.OperationType type) {
-		run(new DeliverStream(type, session, log(DeliverStream.UI.class),
-				copyArea, "", null));
+		DeliverStream.UI _ui = log(DeliverStream.UI.class, new UI());
+		run(new DeliverStream(type, session, _ui, integeration, copyArea, true,
+				false, null));
 	}
+
+	private static class UI {
+
+		private int status;
+
+		public void statusNotify(int i, String s) {
+			Log.debug(s.trim());
+			status = i;
+		}
+
+		public void configChangeNotify(String s) {
+			Log.debug(s.trim());
+		}
+
+		public boolean inProgress() {
+			return status == 1001;
+		}
+
+		public boolean isOk() {
+			return status > 0;
+		}
+	};
 }
