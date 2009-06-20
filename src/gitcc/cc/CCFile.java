@@ -32,6 +32,10 @@ public class CCFile {
 		return status;
 	}
 
+	public boolean hasVersion() {
+		return version.getFullVersion().length() > 0;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		CCFile f = (CCFile) obj;

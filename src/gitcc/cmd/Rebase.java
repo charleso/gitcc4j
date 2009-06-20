@@ -27,7 +27,7 @@ public class Rebase extends Command {
 		if (normal)
 			git.checkout(config.getCC());
 		for (CCCommit c : commits) {
-			handleFiles(c.getFiles());
+			handleFiles(c.getFiles(), c.getFiles());
 			git.commit(c);
 		}
 		if (normal) {
@@ -39,22 +39,22 @@ public class Rebase extends Command {
 		git.tag(config.getCI(), config.getCC());
 	}
 
-	private void handleFiles(List<CCFile> files) throws Exception {
+	private void handleFiles(List<CCFile> all, List<CCFile> files)
+			throws Exception {
 		for (CCFile f : files) {
 			if (f.getStatus() == Status.Directory) {
-				handleFiles(cc.diffPred(f));
+				handleFiles(all, cc.diffPred(f));
 			} else if (f.getStatus() == Status.Added) {
-				add(f);
+				add(all, f);
 			} else {
 				remove(f);
 			}
 		}
 	}
 
-	private void add(CCFile f) throws Exception {
-		// TODO Full renames
-		if (f.getVersion().getFullVersion().length() == 0) {
-			System.out.println("IGNORED file: " + f);
+	private void add(List<CCFile> all, CCFile f) throws Exception {
+		if (!f.hasVersion()) {
+			handleRename(all, f);
 			return;
 		}
 		File newFile = cc.get(f);
@@ -76,5 +76,15 @@ public class Rebase extends Command {
 	private void remove(CCFile f) {
 		if (new File(git.getRoot(), f.getFile()).exists())
 			git.remove(f.getFile());
+	}
+
+	// TODO Full renames
+	private void handleRename(List<CCFile> all, CCFile f) {
+		for (CCFile file : all) {
+			if (file.getFile().equals(f.getFile())) {
+				return;
+			}
+		}
+		System.out.println("IGNORED file: " + f);
 	}
 }
