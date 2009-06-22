@@ -64,7 +64,7 @@ public class UCM extends ClearcaseImpl {
 		if (ui.inProgress()) {
 			ui = _rebase(RebaseStream.OperationType.REBASE_RESUME);
 		}
-		if (ui.isOk()) {
+		if (ui.toBeCompleted()) {
 			_rebase(RebaseStream.OperationType.REBASE_COMPLETE);
 		}
 	}
@@ -127,9 +127,12 @@ public class UCM extends ClearcaseImpl {
 
 		private int status;
 
+		public void runComplete(byte b, int i, boolean f) {
+			status = b;
+		}
+
 		public void statusNotify(int i, String s) {
 			Log.debug(s.trim());
-			status = i;
 		}
 
 		public void configChangeNotify(String s) {
@@ -140,8 +143,8 @@ public class UCM extends ClearcaseImpl {
 			return status == 1001;
 		}
 
-		public boolean isOk() {
-			return status > 0;
+		public boolean toBeCompleted() {
+			return status == 12;
 		}
 	};
 }

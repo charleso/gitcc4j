@@ -56,11 +56,13 @@ public class BaselineUtil extends BaseClearcase {
 		if (descs == null || descs.length == 0)
 			return;
 		for (IBaselineDescription desc : descs) {
-			baselines.put(desc.getComponent().getName(), desc.getHandle());
+			if (desc.getIsComposite()) {
+				baselines.put(desc.getComponent().getName(), desc.getHandle());
+			}
 		}
 		IBaselineHandle[] handles = baselines.values().toArray(
 				new IBaselineHandle[baselines.size()]);
-		new RecommendBaseline(session, log(RecommendBaseline.IListener.class),
-				sh, handles);
+		run(new RecommendBaseline(session,
+				log(RecommendBaseline.IListener.class), sh, handles));
 	}
 }
