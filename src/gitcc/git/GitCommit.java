@@ -4,6 +4,8 @@ public class GitCommit {
 
 	private String id;
 
+	private String author;
+
 	private String message;
 
 	public void setId(String id) {
@@ -12,6 +14,14 @@ public class GitCommit {
 
 	public String getId() {
 		return id;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 
 	public void setMessage(String message) {

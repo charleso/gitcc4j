@@ -1,8 +1,13 @@
 package gitcc.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Config {
 
 	private static final String DEFAULT_MASTER = "master";
+
+	private Map<String, User> users = new HashMap<String, User>();
 
 	private String suffix = "example.com";
 	private String branch;
@@ -132,5 +137,16 @@ public class Config {
 
 	public void setStream(String stream) {
 		this.stream = stream;
+	}
+
+	public void addUser(User user) {
+		users.put(user.getUsername(), user);
+	}
+
+	public User getUser(String author) {
+		User user = users.get(author);
+		if (user == null)
+			user = new User(author, suffix);
+		return user;
 	}
 }

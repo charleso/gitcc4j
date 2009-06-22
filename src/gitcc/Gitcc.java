@@ -33,7 +33,7 @@ public class Gitcc {
 
 		Config config = command.config = new Config();
 		Log.setDebug(config.isDebug());
-		Git git = command.git = new GitImpl(findGitRoot(), config);
+		Git git = command.git = new GitImpl(findGitRoot());
 		config.setBranch(git.getBranch());
 		try {
 			new ConfigParser().parseConfig(config, git.getRoot());

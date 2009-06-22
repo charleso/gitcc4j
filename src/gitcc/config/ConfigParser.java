@@ -1,5 +1,7 @@
 package gitcc.config;
 
+import gitcc.Log;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -19,6 +21,7 @@ public class ConfigParser {
 	public void parseConfig(Config config, File root) throws Exception {
 		File file = new File(root, ".git/gitcc");
 		parseConfig(config, new FileReader(file));
+		loadUsers(config, root);
 	}
 
 	protected void parseConfig(Config config, Reader reader) throws Exception {
@@ -37,6 +40,26 @@ public class ConfigParser {
 					setter.set(values[0].trim(), values[1].trim());
 				}
 			}
+		}
+	}
+
+	private void loadUsers(Config config, File root) {
+		try {
+			parseUsers(config, new FileReader(new File(root, ".git/users")));
+		} catch (Exception e) {
+			// Ignore
+		}
+	}
+
+	protected void parseUsers(Config config, Reader reader) throws Exception {
+		BufferedReader in = new BufferedReader(reader);
+		for (String line; (line = in.readLine()) != null;) {
+			String[] user = line.split(SEP);
+			if (user.length != 4) {
+				Log.debug("Invalid user entry: " + line);
+				continue;
+			}
+			config.addUser(new User(user[0], user[1], user[2], user[3]));
 		}
 	}
 

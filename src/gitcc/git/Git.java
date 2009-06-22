@@ -1,6 +1,7 @@
 package gitcc.git;
 
 import gitcc.cc.CCCommit;
+import gitcc.config.User;
 
 import java.io.File;
 import java.util.Date;
@@ -12,7 +13,7 @@ public interface Git {
 
 	void remove(String file);
 
-	void commit(CCCommit commit);
+	void commit(CCCommit commit, User user);
 
 	String getBranch();
 

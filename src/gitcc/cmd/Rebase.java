@@ -30,7 +30,7 @@ public class Rebase extends Command {
 			git.checkout(config.getCC());
 		for (CCCommit c : commits) {
 			handleFiles(c.getFiles(), c.getFiles());
-			git.commit(c);
+			git.commit(c, config.getUser(c.getAuthor()));
 		}
 		if (normal) {
 			git.rebase(config.getCI(), config.getCC());

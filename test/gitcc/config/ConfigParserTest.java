@@ -30,4 +30,18 @@ public class ConfigParserTest extends TestCase {
 		assertEquals("fooBar", ConfigParser.processName("foo.bar"));
 		assertEquals("fooBarFoo", ConfigParser.processName("foo.bar.foo"));
 	}
+
+	public void testUsers() throws Exception {
+		Config config = new Config();
+		String sconfig = "user1|Full Name|email@test.com|password\n"
+				+ "user2|Another name|foo@bah.com|hello";
+		new ConfigParser().parseUsers(config, new StringReader(sconfig));
+		User user = config.getUser("user1");
+		assertEquals("Full Name", user.getName());
+		assertEquals("email@test.com", user.getEmail());
+		assertEquals("password", user.getPassword());
+		assertEquals("hello", config.getUser("user2").getPassword());
+		assertEquals("baduser@example.com", config.getUser("baduser")
+				.getEmail());
+	}
 }
