@@ -114,6 +114,11 @@ public class GitImpl extends Exec implements Git {
 	}
 
 	@Override
+	public void checkoutForce(String branch) {
+		exec("checkout", "-f", branch);
+	}
+
+	@Override
 	public String getBlob(String file, String sha) {
 		return exec("ls-tree", "-z", sha, file).split(" ")[2].split("\t")[0];
 	}
@@ -126,5 +131,20 @@ public class GitImpl extends Exec implements Git {
 	@Override
 	public String mergeBase(String commit1, String commit2) {
 		return exec("merge-base", commit1, commit2);
+	}
+
+	@Override
+	public void merge(String remote) {
+		exec("merge", remote);
+	}
+
+	@Override
+	public String getId(String treeish) {
+		return exec("log", "-n", "1", "--pretty=format:%H", treeish);
+	}
+
+	@Override
+	public void setConfig(String name, String value) {
+		exec("config", name, value);
 	}
 }

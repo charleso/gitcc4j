@@ -23,6 +23,12 @@ public class Config {
 	private String integration;
 	private String stream;
 
+	private String smtp;
+	private String sender;
+	private String[] recipients;
+
+	private long sleep = 5 * 60 * 1000;
+
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
 	}
@@ -137,6 +143,34 @@ public class Config {
 
 	public void setStream(String stream) {
 		this.stream = stream;
+	}
+
+	public void setEmailSmtp(String smtp) {
+		this.smtp = smtp;
+	}
+
+	public String getEmailSmtp() {
+		return smtp;
+	}
+
+	public String[] getEmailRecipients() {
+		return recipients;
+	}
+
+	public void setEmailRecipients(String[] recipients) {
+		this.recipients = recipients;
+	}
+
+	public String getEmailSender() {
+		return sender;
+	}
+
+	public void setEmailSender(String sender) {
+		this.sender = sender;
+	}
+
+	public long getSleep() {
+		return sleep;
 	}
 
 	public void addUser(User user) {

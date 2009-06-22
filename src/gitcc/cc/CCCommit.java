@@ -14,6 +14,16 @@ public class CCCommit {
 
 	private String author;
 
+	public CCCommit() {
+		super();
+	}
+
+	public CCCommit(String author, Date date, String message) {
+		this.author = author;
+		this.date = date;
+		this.message = message;
+	}
+
 	public List<CCFile> getFiles() {
 		return files;
 	}

@@ -3,6 +3,7 @@ package gitcc.cc;
 import gitcc.Common;
 import gitcc.git.FileStatus;
 import gitcc.git.GitCommit;
+import gitcc.util.CheckinException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -69,7 +70,7 @@ public class Transaction extends Common {
 			String blob = git.getBlob(file, mergeBase);
 			if (!hash.equals(blob)) {
 				String s = "File has been modified: %s. Try rebasing.";
-				throw new RuntimeException(String.format(s, file));
+				throw new CheckinException(String.format(s, file));
 			}
 		}
 	}
@@ -137,7 +138,6 @@ public class Transaction extends Common {
 		for (String f : checkouts) {
 			cc.checkin(f, commit);
 		}
-		git.tag(config.getCI(), id);
 	}
 
 	private void write(FileStatus s) {

@@ -5,6 +5,7 @@ import gitcc.cc.ClearcaseImpl;
 import gitcc.cc.UCM;
 import gitcc.cmd.Checkin;
 import gitcc.cmd.Command;
+import gitcc.cmd.Daemon;
 import gitcc.cmd.Rebase;
 import gitcc.cmd.Reset;
 import gitcc.config.Config;
@@ -21,7 +22,7 @@ import java.util.Arrays;
 public class Gitcc {
 
 	private static Class<Command>[] commands = new Class[] { Checkin.class,
-			Rebase.class, Reset.class };
+			Rebase.class, Reset.class, Daemon.class };
 
 	public static void main(String[] args) throws Exception {
 		ProxyHelper.initProxy();
@@ -47,7 +48,7 @@ public class Gitcc {
 			System.exit(1);
 		}
 		command.cc = createClearcase(command.config);
-
+		command.init();
 		try {
 			command.execute();
 			System.exit(0);

@@ -5,6 +5,7 @@ import gitcc.git.FileStatus;
 import gitcc.git.Git;
 import gitcc.git.GitCommit;
 import gitcc.git.FileStatus.Status;
+import gitcc.util.CheckinException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -76,9 +77,8 @@ public class TransactionTest extends TestCase {
 		try {
 			process();
 			fail();
-		} catch (RuntimeException e) {
-			assertEquals("File has been modified: m. Try rebasing.", e
-					.getMessage());
+		} catch (CheckinException e) {
+			// Ignore
 		}
 	}
 

@@ -37,7 +37,7 @@ public class Exec {
 			byte[] stdout = getBytes(process.getInputStream());
 			String error = new String(getBytes(process.getErrorStream()));
 			if (process.waitFor() > 0) {
-				throw new ExecException(error + new String(stdout));
+				throw new ExecException(error + bytesToString(stdout));
 			}
 			return stdout;
 		} catch (InterruptedException e) {
@@ -65,7 +65,7 @@ public class Exec {
 	}
 
 	public String exec(String[] env, String... args) {
-		return new String(_exec(env, args)).trim();
+		return bytesToString(_exec(env, args));
 	}
 
 	public String exec(String... args) {
@@ -75,4 +75,9 @@ public class Exec {
 	public File getRoot() {
 		return root;
 	}
+
+	private String bytesToString(byte[] stdout) {
+		return new String(stdout).trim();
+	}
+
 }

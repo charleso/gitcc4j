@@ -21,6 +21,7 @@ public class Checkin extends Command {
 			Transaction t = init(new Transaction(c, git.getStatuses(c)));
 			t.cc = cc.getSession(credentials);
 			t.process();
+			git.tag(config.getCI(), c.getId());
 		}
 		cc.deliver();
 	}

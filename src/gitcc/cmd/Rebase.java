@@ -32,12 +32,16 @@ public class Rebase extends Command {
 			git.commit(c, config.getUser(c.getAuthor()));
 		}
 		if (normal) {
-			git.rebase(config.getCI(), config.getCC());
-			git.rebase(config.getCC(), branch);
+			doRebase();
 		} else {
 			git.branch(config.getCC());
 		}
 		git.tag(config.getCI(), config.getCC());
+	}
+
+	protected void doRebase() {
+		git.rebase(config.getCI(), config.getCC());
+		git.rebase(config.getCC(), config.getBranch());
 	}
 
 	private void handleFiles(List<CCFile> all, List<CCFile> files)
