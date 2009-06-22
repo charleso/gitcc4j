@@ -42,4 +42,6 @@ public interface Clearcase {
 	void write(String file, byte[] bytes);
 
 	File toFile(String file);
+
+	Clearcase getSession(Credentials credentials);
 }

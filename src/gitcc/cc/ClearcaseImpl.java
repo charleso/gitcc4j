@@ -68,6 +68,15 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 		branches = config.getBranches();
 	}
 
+	private ClearcaseImpl(ClearcaseImpl cc, Session session) {
+		this.session = cc.session;
+		this.copyArea = cc.copyArea;
+		this.root = cc.root;
+		this.files = cc.files;
+		this.branches = cc.branches;
+		this.extraPath = cc.extraPath;
+	}
+
 	private CopyAreaFile[] convert(Config config) throws Exception {
 		String[] includes = config.getInclude();
 		CopyAreaFile[] files = new CopyAreaFile[includes.length];
@@ -276,6 +285,14 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	@Override
 	public boolean exists(String path) {
 		return copyFile(path).exists();
+	}
+
+	@Override
+	public Clearcase getSession(Credentials credentials) {
+		if (credentials.getPassword() == null)
+			return this;
+		Session session2 = new Session(session.getUrl(), credentials);
+		return new ClearcaseImpl(this, session2);
 	}
 
 	private void debug(String s) {

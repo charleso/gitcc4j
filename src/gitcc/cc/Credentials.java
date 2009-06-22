@@ -16,6 +16,13 @@ public class Credentials implements IClearCaseUserCredentials {
 		group = config.getGroup();
 	}
 
+	public Credentials(String username, String password, String group) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.group = group;
+	}
+
 	@Override
 	public String getUsername() {
 		return username;

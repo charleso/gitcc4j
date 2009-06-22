@@ -1,9 +1,10 @@
 package gitcc.cmd;
 
-import java.util.List;
-
+import gitcc.cc.Credentials;
 import gitcc.cc.Transaction;
 import gitcc.git.GitCommit;
+
+import java.util.List;
 
 public class Checkin extends Command {
 
@@ -13,8 +14,13 @@ public class Checkin extends Command {
 		if (log.isEmpty())
 			return;
 		cc.update();
-		for (GitCommit c : log) {
-			init(new Transaction(c, git.getStatuses(c))).process();
+		String range = config.getCI() + ".." + config.getBranch();
+		for (GitCommit c : git.log(range)) {
+			Credentials credentials = new Credentials(c.getAuthor(), config
+					.getUser(c.getAuthor()).getPassword(), config.getGroup());
+			Transaction t = init(new Transaction(c, git.getStatuses(c)));
+			t.cc = cc.getSession(credentials);
+			t.process();
 		}
 		cc.deliver();
 	}
