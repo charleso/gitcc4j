@@ -9,6 +9,7 @@ import gitcc.cmd.Rebase;
 import gitcc.cmd.Reset;
 import gitcc.config.Config;
 import gitcc.config.ConfigParser;
+import gitcc.config.ConfigValidator;
 import gitcc.git.Git;
 import gitcc.git.GitImpl;
 import gitcc.util.ExecException;
@@ -39,13 +40,19 @@ public class Gitcc {
 		} catch (Exception e) {
 			throw new RuntimeException("Missing configuation file", e);
 		}
+		try {
+			new ConfigValidator().validate(config);
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
 		command.cc = createClearcase(command.config);
 
 		try {
 			command.execute();
 			System.exit(0);
 		} catch (ExecException e) {
-			System.err.println(e);
+			System.err.println(e.getMessage());
 			System.exit(1);
 		} catch (Exception e) {
 			e.printStackTrace();
