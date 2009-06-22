@@ -1,8 +1,16 @@
 package gitcc.config;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.Reader;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConfigParser {
 
@@ -10,51 +18,74 @@ public class ConfigParser {
 
 	public void parseConfig(Config config, File root) throws Exception {
 		File file = new File(root, ".git/gitcc");
-		BufferedReader in = new BufferedReader(new FileReader(file));
+		parseConfig(config, new FileReader(file));
+	}
+
+	protected void parseConfig(Config config, Reader reader) throws Exception {
+		ConfigSetter setter = new ConfigSetter(config);
 		String mode = "core";
+		BufferedReader in = new BufferedReader(reader);
 		for (String line; (line = in.readLine()) != null;) {
 			line = line.trim();
-			if (line.length() == 0)
+			if (line.length() == 0 || line.startsWith("#"))
 				continue;
 			if (line.startsWith("[")) {
 				mode = line.substring(1, line.length() - 1);
 			} else {
 				String[] values = line.split("=", 2);
-				parseValue(config, mode, values[0].trim(), values[1].trim());
+				if ("core".equals(mode) || mode.equals(config._getBranch())) {
+					setter.set(values[0].trim(), values[1].trim());
+				}
 			}
 		}
 	}
 
-	private void parseValue(Config config, String mode, String name,
-			String value) {
-		if ("core".equals(mode)) {
-			if ("debug".equals(name))
-				config.setDebug(Boolean.parseBoolean(value));
-			else if ("include".equals(name))
-				config.setInclude(value.split(SEP));
-			else if ("type".equals(name))
-				config.setType(value);
-			else if ("url".equals(name))
-				config.setUrl(value);
-			else if ("username".equals(name))
-				config.setUsername(value);
-			else if ("password".equals(name))
-				config.setPassword(value);
-			else if ("suffix".equals(name))
-				config.setSuffix(value);
-			else if ("group".equals(name))
-				config.setGroup(value);
-		} else {
-			if (mode.equals(config._getBranch())) {
-				if ("clearcase".equals(name))
-					config.setClearcase(value);
-				else if ("branches".equals(name))
-					config.setBranches(value.split(SEP));
-				else if ("integration".equals(name))
-					config.setIntegration(value);
-				else if ("stream".equals(name))
-					config.setStream(value);
+	private static class ConfigSetter {
+		private Map<String, Method> methods = new HashMap<String, Method>();
+		private Config config;
+
+		public ConfigSetter(Config config) {
+			this.config = config;
+			init();
+		}
+
+		private void init() {
+			BeanInfo beanInfo;
+			try {
+				beanInfo = Introspector.getBeanInfo(config.getClass());
+			} catch (IntrospectionException e) {
+				throw new RuntimeException(e);
+			}
+			for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
+				methods.put(processName(pd.getName()), pd.getWriteMethod());
 			}
 		}
+
+		public void set(String name, String svalue) {
+			Method m = methods.get(name);
+			if (m == null)
+				return;
+			Object value = svalue;
+			Class<?> type = m.getParameterTypes()[0];
+			if (String[].class.isAssignableFrom(type))
+				value = svalue.split(SEP);
+			try {
+				m.invoke(config, value);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+	}
+
+	protected static String processName(String name) {
+		String[] split = name.split("\\.");
+		StringBuilder b = new StringBuilder();
+		b.append(split[0]);
+		for (int i = 1; i < split.length; i++) {
+			b.append(Character.toUpperCase(split[i].charAt(0)));
+			b.append(split[i].substring(1));
+		}
+		return b.toString();
 	}
 }
