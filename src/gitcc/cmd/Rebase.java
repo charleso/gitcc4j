@@ -8,9 +8,7 @@ import gitcc.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -56,43 +54,24 @@ public class Rebase extends Command {
 	}
 
 	private void add(List<CCFile> all, CCFile f) throws Exception {
-		File newFile = getFile(all, f);
-		if (newFile != null) {
-			File dest = new File(git.getRoot(), f.getFile());
-			copyFile(newFile, dest);
-			try {
-				git.add(f.getFile());
-			} catch (ExecException e) {
-				if (e.getMessage().contains("The following paths are ignored"))
-					return;
-				throw e;
-			}
+		FileHandler fileHandler = getFile(all, f);
+		if (fileHandler.getNewFile() == null)
+			return;
+		fileHandler.copyFile(new File(git.getRoot(), f.getFile()));
+		try {
+			git.add(f.getFile());
+		} catch (ExecException e) {
+			if (e.getMessage().contains("The following paths are ignored"))
+				return;
+			throw e;
 		}
 	}
 
-	private File getFile(List<CCFile> all, CCFile f) {
-		File newFile;
+	private FileHandler getFile(List<CCFile> all, CCFile f) {
 		if (!f.hasVersion()) {
-			newFile = handleRename(all, f);
-		} else {
-			newFile = cc.get(f);
+			return new RenameHandler(all, f);
 		}
-		return newFile;
-	}
-
-	private void copyFile(File newFile, File dest) throws IOException,
-			FileNotFoundException {
-		if (dest.exists() && !dest.delete())
-			throw new RuntimeException("Could not delete file: " + dest);
-		dest.getParentFile().mkdirs();
-		if (!newFile.renameTo(dest)) {
-			try {
-				IOUtils.copy(new FileInputStream(newFile),
-						new FileOutputStream(dest));
-			} finally {
-				newFile.delete();
-			}
-		}
+		return new VersionHandler(f);
 	}
 
 	private void remove(CCFile f) {
@@ -100,18 +79,74 @@ public class Rebase extends Command {
 			git.remove(f.getFile());
 	}
 
-	private File handleRename(List<CCFile> all, CCFile f) {
-		for (CCFile file : all) {
-			if (file.getFile().equals(f.getFile())) {
-				return null;
-			}
+	private abstract class FileHandler {
+
+		protected File newFile;
+
+		public void setFile(File file) {
+			newFile = file;
 		}
 
-		// This is the lazy approach, but 9 times out of 10 it'll be fine.
-		// The probably is that the git history will have a slight anomaly.
-		// The important thing is that the working tree will be correct by the
-		// end of this rebase.
-		File newFile = cc.toFile(f.getFile());
-		return newFile.exists() ? newFile : null;
+		public abstract void copyFile(File dest) throws Exception;
+
+		public File getNewFile() {
+			return newFile;
+		}
+	}
+
+	private class VersionHandler extends FileHandler {
+
+		public VersionHandler(CCFile f) {
+			setFile(cc.get(f));
+		}
+
+		@Override
+		public void copyFile(File dest) throws Exception {
+			if (dest.exists() && !dest.delete())
+				throw new RuntimeException("Could not delete file: " + dest);
+			dest.getParentFile().mkdirs();
+			if (!newFile.renameTo(dest)) {
+				try {
+					IOUtils.copy(new FileInputStream(newFile),
+							new FileOutputStream(dest));
+				} finally {
+					newFile.delete();
+				}
+			}
+		}
+	}
+
+	private class RenameHandler extends FileHandler {
+
+		public RenameHandler(List<CCFile> all, CCFile f) {
+			setFile(handleRename(all, f));
+		}
+
+		private File handleRename(List<CCFile> all, CCFile f) {
+			for (CCFile file : all) {
+				if (file.getFile().equals(f.getFile())) {
+					return null;
+				}
+			}
+
+			// This is the lazy approach, but 9 times out of 10 it'll be fine.
+			// The probably is that the git history will have a slight anomaly.
+			// The important thing is that the working tree will be correct by
+			// the
+			// end of this rebase.
+			File newFile = cc.toFile(f.getFile());
+			return newFile.exists() ? newFile : null;
+		}
+
+		@Override
+		public void copyFile(File dest) throws Exception {
+			if (newFile.isDirectory()) {
+				// TODO Ignore for now
+				// How do we know if this was a rename, or a new addition?
+			} else {
+				IOUtils.copy(new FileInputStream(newFile),
+						new FileOutputStream(dest));
+			}
+		}
 	}
 }
