@@ -3,6 +3,7 @@ package gitcc.cmd;
 import gitcc.cc.CCCommit;
 import gitcc.cc.CCFile;
 import gitcc.cc.CCFile.Status;
+import gitcc.util.ExecException;
 import gitcc.util.IOUtils;
 
 import java.io.File;
@@ -59,7 +60,13 @@ public class Rebase extends Command {
 		if (newFile != null) {
 			File dest = new File(git.getRoot(), f.getFile());
 			copyFile(newFile, dest);
-			git.add(f.getFile());
+			try {
+				git.add(f.getFile());
+			} catch (ExecException e) {
+				if (e.getMessage().contains("The following paths are ignored"))
+					return;
+				throw e;
+			}
 		}
 	}
 
