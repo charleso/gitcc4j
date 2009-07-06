@@ -18,10 +18,11 @@ public class ConfigParser {
 
 	private static final String SEP = "\\|";
 
-	public void parseConfig(Config config, File root) throws Exception {
-		File file = new File(root, ".git/gitcc");
+	public boolean parseConfig(Config config, File file) throws Exception {
+		if (!file.exists())
+			return false;
 		parseConfig(config, new FileReader(file));
-		loadUsers(config, root);
+		return true;
 	}
 
 	protected void parseConfig(Config config, Reader reader) throws Exception {
@@ -43,12 +44,8 @@ public class ConfigParser {
 		}
 	}
 
-	private void loadUsers(Config config, File root) {
-		try {
-			parseUsers(config, new FileReader(new File(root, ".git/users")));
-		} catch (Exception e) {
-			// Ignore
-		}
+	public void loadUsers(Config config, File root) throws Exception {
+		parseUsers(config, new FileReader(root));
 	}
 
 	protected void parseUsers(Config config, Reader reader) throws Exception {

@@ -36,22 +36,28 @@ public class Gitcc {
 		Git git = command.git = new GitImpl(findGitRoot());
 		command.init();
 		config.setBranch(git.getBranch());
-		try {
-			new ConfigParser().parseConfig(config, git.getRoot());
-		} catch (Exception e) {
-			throw new RuntimeException("Missing configuation file", e);
-		}
+
+		ConfigParser parser = new ConfigParser();
+		if (!parser.parseConfig(config, new File(git.getRoot(), ".git/gitcc")))
+			fail("Missing configuration file: .git/gitcc");
+		parser.parseConfig(config, new File(git.getRoot(), ".gitcc_config"));
+		parser.loadUsers(config, new File(git.getRoot(), ".git/users"));
+
 		command.cc = createClearcase(command.config);
 		try {
 			command.execute();
 			System.exit(0);
 		} catch (ExecException e) {
-			System.err.println(e.getMessage());
-			System.exit(1);
+			fail(e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+
+	private static void fail(String message) {
+		System.err.println(message);
+		System.exit(1);
 	}
 
 	private static File findGitRoot() {
