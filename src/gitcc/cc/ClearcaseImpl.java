@@ -45,7 +45,7 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	private static final String DATE_FORMAT = "dd-MMM-yyyy.HH:mm:ss";
 	private static final String RPC_PATH = "/TeamCcrc/ccrc/";
 
-	private Config config;
+	protected Config config;
 	protected Session session;
 
 	protected CopyArea copyArea;
@@ -141,6 +141,11 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	@Override
 	public void deliver() {
 		// Do nothing
+	}
+
+	@Override
+	public void makeBaseline() {
+		// Ignore
 	}
 
 	@Override
@@ -283,21 +288,17 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	}
 
 	@Override
-	public Clearcase cloneForUser(User user) {
+	public Clearcase cloneForUser(User user) throws Exception {
 		if (user == null || user.getPassword() == null)
 			return this;
 		Credentials credentials = new Credentials(user.getUsername(), user
 				.getPassword(), config.getGroup());
-		try {
-			ClearcaseImpl cc = getClass().newInstance();
-			cc.config = config;
-			cc.session = new Session(session.getUrl(), credentials);
-			cc.setRoot(user.getView() == null ? user.getView() : config
-					.getClearcase());
-			return cc;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		ClearcaseImpl cc = getClass().newInstance();
+		cc.config = config;
+		cc.session = new Session(session.getUrl(), credentials);
+		String view = user.getView();
+		cc.setRoot(view != null ? view : config.getClearcase());
+		return cc;
 	}
 
 	private void debug(String s) {

@@ -83,12 +83,12 @@ public class ConfigParser {
 				throw new RuntimeException(e);
 			}
 			for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
-				methods.put(processName(pd.getName()), pd.getWriteMethod());
+				methods.put(pd.getName(), pd.getWriteMethod());
 			}
 		}
 
 		public void set(String name, String svalue) {
-			Method m = methods.get(name);
+			Method m = methods.get(processName(name));
 			if (m == null)
 				return;
 			Object value = svalue;

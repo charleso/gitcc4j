@@ -2,7 +2,9 @@ package gitcc.cc;
 
 import gitcc.Log;
 import gitcc.config.Config;
+import gitcc.config.User;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,12 +25,21 @@ public class UCM extends ClearcaseImpl {
 	private final Map<String, String> activities = new HashMap<String, String>();
 
 	private CopyArea integeration;
-	private String stream;
 
 	public UCM(Config config) throws Exception {
 		super(config);
+		init(config);
+	}
+
+	@Override
+	public Clearcase cloneForUser(User user) throws Exception {
+		UCM ucm = (UCM) super.cloneForUser(user);
+		ucm.init(config);
+		return ucm;
+	}
+
+	private void init(Config config) throws IOException {
 		integeration = CopyArea.open(config.getIntegration());
-		stream = config.getStream();
 	}
 
 	protected UCM() {
@@ -118,7 +129,11 @@ public class UCM extends ClearcaseImpl {
 				HIJACK_TREATMENT, false));
 		_deliver(DeliverStream.OperationType.DELIVER_START);
 		_deliver(DeliverStream.OperationType.DELIVER_COMPLETE);
-		new BaselineUtil(session, stream).run();
+	}
+
+	@Override
+	public void makeBaseline() {
+		new BaselineUtil(session, config.getStream()).run();
 	}
 
 	private void _deliver(DeliverStream.OperationType type) {

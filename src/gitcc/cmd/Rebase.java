@@ -20,7 +20,7 @@ public class Rebase extends Command {
 		cc.rebase();
 		String branch = config.getBranch();
 		boolean normal = branch != null;
-		Date since = normal ? git.getCommitDate(config.getCC()) : null;
+		Date since = normal ? getSince() : null;
 		Collection<CCCommit> commits = cc.getHistory(since);
 		if (commits.isEmpty())
 			return;
@@ -37,6 +37,10 @@ public class Rebase extends Command {
 			git.branch(config.getCC());
 		}
 		git.tag(config.getCI(), config.getCC());
+	}
+
+	protected Date getSince() {
+		return git.getCommitDate(config.getCC());
 	}
 
 	protected void doRebase() {

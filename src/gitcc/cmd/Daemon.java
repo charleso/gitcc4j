@@ -1,11 +1,13 @@
 package gitcc.cmd;
 
 import gitcc.Log;
+import gitcc.config.Config;
 import gitcc.git.GitCommit;
 import gitcc.util.CheckinException;
 import gitcc.util.EmailUtil;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,17 +27,19 @@ import java.util.List;
 public class Daemon extends Command {
 
 	private EmailUtil email;
+	private Date since;
 
 	@Override
 	public void init() {
 		email = new EmailUtil(config);
-		git.checkout(config.getCC());
+		git.checkout(Config.DEFAULT_MASTER);
 		git.setConfig("receive.denyCurrentBranch", "true");
 		git.setConfig("receive.denyNonFastForwards", "true");
 	}
 
 	@Override
 	public void execute() throws Exception {
+		git.checkout(config.getCC());
 		while (true) {
 			if (sanityCheck(config.getCC(), config.getBranch())) {
 				try {
@@ -48,6 +52,7 @@ public class Daemon extends Command {
 				String error = "Repository is in a bad state. Wake me up when you fix it.";
 				Log.info(error);
 			}
+			Log.info("Sleeping...");
 			Thread.sleep(config.getSleep());
 		}
 	}
@@ -70,11 +75,18 @@ public class Daemon extends Command {
 		try {
 			exec(new Checkin() {
 				@Override
-				protected void checkin(List<GitCommit> log) {
-					GitCommit c = log.get(0);
-					cc = cc.cloneForUser(config.getUser(c.getAuthor()));
+				protected void checkin(List<GitCommit> log) throws Exception {
 					// Only checkin one at a time so we can change users
-					super.checkin(Arrays.asList(c));
+					for (GitCommit c : log) {
+						cc = cc.cloneForUser(config.getUser(c.getAuthor()));
+						super.checkin(Arrays.asList(c));
+					}
+				}
+
+				@Override
+				protected void makeBaseline() {
+					// TODO Permission problems
+					Daemon.this.cc.makeBaseline();
 				}
 			});
 		} catch (CheckinException e) {
@@ -98,6 +110,13 @@ public class Daemon extends Command {
 				} finally {
 					git.checkoutForce(branch_cc);
 				}
+			}
+
+			@Override
+			protected Date getSince() {
+				Date temp = since != null ? since : super.getSince();
+				since = new Date();
+				return temp;
 			}
 		});
 	}

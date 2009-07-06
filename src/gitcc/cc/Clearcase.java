@@ -45,5 +45,7 @@ public interface Clearcase {
 
 	File toFile(String file);
 
-	Clearcase cloneForUser(User user);
+	Clearcase cloneForUser(User user) throws Exception;
+
+	void makeBaseline();
 }

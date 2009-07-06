@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Config {
 
-	private static final String DEFAULT_MASTER = "master";
+	public static final String DEFAULT_MASTER = "master";
 
 	private Map<String, User> users = new HashMap<String, User>();
 
@@ -175,10 +175,13 @@ public class Config {
 
 	public void addUser(User user) {
 		users.put(user.getUsername(), user);
+		users.put(user.getEmail(), user);
 	}
 
 	public User getUser(String author) {
 		User user = users.get(author);
+		if (user == null)
+			user = users.get(author.substring(0, author.indexOf('@')));
 		if (user == null)
 			user = new User(author, suffix);
 		return user;

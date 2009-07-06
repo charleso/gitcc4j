@@ -22,7 +22,8 @@ public class GitUtil {
 		GitCommit commit = new GitCommit();
 		String[] s = line.split("\1");
 		commit.setId(s[0]);
-		commit.setMessage(s[1].trim());
+		commit.setAuthor(s[1].trim());
+		commit.setMessage(s[2].trim());
 		return commit;
 	}
 

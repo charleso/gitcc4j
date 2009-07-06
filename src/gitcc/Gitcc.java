@@ -10,7 +10,6 @@ import gitcc.cmd.Rebase;
 import gitcc.cmd.Reset;
 import gitcc.config.Config;
 import gitcc.config.ConfigParser;
-import gitcc.config.ConfigValidator;
 import gitcc.git.Git;
 import gitcc.git.GitImpl;
 import gitcc.util.ExecException;
@@ -35,20 +34,14 @@ public class Gitcc {
 		Config config = command.config = new Config();
 		Log.setDebug(config.isDebug());
 		Git git = command.git = new GitImpl(findGitRoot());
+		command.init();
 		config.setBranch(git.getBranch());
 		try {
 			new ConfigParser().parseConfig(config, git.getRoot());
 		} catch (Exception e) {
 			throw new RuntimeException("Missing configuation file", e);
 		}
-		try {
-			new ConfigValidator().validate(config);
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			System.exit(1);
-		}
 		command.cc = createClearcase(command.config);
-		command.init();
 		try {
 			command.execute();
 			System.exit(0);
