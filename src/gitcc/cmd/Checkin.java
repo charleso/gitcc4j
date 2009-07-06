@@ -1,11 +1,20 @@
 package gitcc.cmd;
 
 import gitcc.cc.Transaction;
+import gitcc.git.FileStatus;
 import gitcc.git.GitCommit;
+import gitcc.git.IgnoreLevel;
 
 import java.util.List;
 
 public class Checkin extends Command {
+
+	private IgnoreLevel ignoreLevel;
+
+	@Override
+	public void init() {
+		ignoreLevel = new IgnoreLevel(config.getIgnoreLevel());
+	}
 
 	@Override
 	public void execute() throws Exception {
@@ -18,12 +27,20 @@ public class Checkin extends Command {
 
 	protected void checkin(List<GitCommit> log) throws Exception {
 		cc.update();
+		int count = 0;
 		for (GitCommit c : log) {
-			init(new Transaction(c, git.getStatuses(c))).process();
+			List<FileStatus> statuses = git.getStatuses(c);
+			statuses = ignoreLevel.filter(statuses);
+			if (!statuses.isEmpty()) {
+				init(new Transaction(c, statuses)).process();
+				count++;
+			}
 			git.branchForce(config.getCI(), c.getId());
 		}
-		cc.deliver();
-		makeBaseline();
+		if (count > 0) {
+			cc.deliver();
+			makeBaseline();
+		}
 	}
 
 	protected void makeBaseline() {

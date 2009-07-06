@@ -16,6 +16,7 @@ public class Config {
 	private String[] branches = new String[] { "main" };
 	private String clearcase;
 	private String type;
+	private int ignoreLevel;
 	private String url;
 	private String username;
 	private String password;
@@ -55,6 +56,14 @@ public class Config {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public int getIgnoreLevel() {
+		return ignoreLevel;
+	}
+
+	public void setIgnoreLevel(int ignoreLevel) {
+		this.ignoreLevel = ignoreLevel;
 	}
 
 	public void setUrl(String url) {

@@ -122,6 +122,8 @@ public class Daemon extends Command {
 	}
 
 	private void exec(Command cmd) throws Exception {
-		init(cmd).execute();
+		init(cmd);
+		cmd.init();
+		cmd.execute();
 	}
 }
