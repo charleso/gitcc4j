@@ -36,7 +36,7 @@ public class EmailUtil {
 		}
 		msg.setRecipients(Message.RecipientType.TO, addressTo);
 
-		msg.setSubject(e.getMessage());
+		msg.setSubject("[gitcc] " + e.getMessage());
 		StringWriter writer = new StringWriter();
 		e.printStackTrace(new PrintWriter(writer));
 		msg.setContent(writer.toString(), "text/plain");
