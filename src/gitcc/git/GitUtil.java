@@ -19,12 +19,8 @@ public class GitUtil {
 	}
 
 	private GitCommit _parseLog(String line) {
-		GitCommit commit = new GitCommit();
 		String[] s = line.split("\1");
-		commit.setId(s[0]);
-		commit.setAuthor(s[1].trim());
-		commit.setMessage(s[2].trim());
-		return commit;
+		return new GitCommit(s[0], s[1], s[2].trim());
 	}
 
 	public String parseLsTree(String blob) {

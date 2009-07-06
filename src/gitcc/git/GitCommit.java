@@ -2,14 +2,16 @@ package gitcc.git;
 
 public class GitCommit {
 
-	private String id;
+	private final String id;
 
-	private String author;
+	private final String author;
 
-	private String message;
+	private final String message;
 
-	public void setId(String id) {
+	public GitCommit(String id, String author, String message) {
 		this.id = id;
+		this.author = author;
+		this.message = message;
 	}
 
 	public String getId() {
@@ -18,14 +20,6 @@ public class GitCommit {
 
 	public String getAuthor() {
 		return author;
-	}
-
-	public void setAuthor(String author) {
-		this.author = author;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
 	}
 
 	public String getMessage() {

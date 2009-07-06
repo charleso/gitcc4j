@@ -26,9 +26,7 @@ public class TransactionTest extends TestCase {
 	private Transaction t;
 
 	private void setup(List<FileStatus> statuses) {
-		GitCommit commit = new GitCommit();
-		commit.setId("sha");
-		commit.setMessage(message);
+		GitCommit commit = new GitCommit("sha", null, message);
 		t = new Transaction(commit, statuses);
 		ctrl = EasyMock.createStrictControl();
 		cc = t.cc = ctrl.createMock(Clearcase.class);
