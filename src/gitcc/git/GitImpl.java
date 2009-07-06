@@ -104,11 +104,6 @@ public class GitImpl extends Exec implements Git {
 	}
 
 	@Override
-	public void tag(String tag, String id) {
-		exec("tag", "-f", tag, id);
-	}
-
-	@Override
 	public void checkout(String branch) {
 		exec("checkout", branch);
 	}

@@ -36,7 +36,7 @@ public class Rebase extends Command {
 		} else {
 			git.branch(config.getCC());
 		}
-		git.tag(config.getCI(), config.getCC());
+		git.branchForce(config.getCI(), config.getCC());
 	}
 
 	protected Date getSince() {

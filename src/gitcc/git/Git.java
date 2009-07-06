@@ -35,8 +35,6 @@ public interface Git {
 
 	void branchForce(String branch, String id);
 
-	void tag(String tag, String id);
-
 	void checkout(String branch);
 
 	void checkoutForce(String branch);

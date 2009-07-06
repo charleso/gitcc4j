@@ -20,7 +20,7 @@ public class Checkin extends Command {
 		cc.update();
 		for (GitCommit c : log) {
 			init(new Transaction(c, git.getStatuses(c))).process();
-			git.tag(config.getCI(), c.getId());
+			git.branchForce(config.getCI(), c.getId());
 		}
 		cc.deliver();
 		makeBaseline();

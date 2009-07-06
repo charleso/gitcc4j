@@ -38,7 +38,7 @@ public abstract class AbstractDaemonTest extends TestCase {
 		daemon.git = git = newGit("repo1", config);
 		git.exec("init");
 		git.exec("commit", "--allow-empty", "-m", "Empty");
-		git.tag("master_ci", "HEAD");
+		git.branchForce("master_ci", "HEAD");
 		git.branch("master_cc");
 	}
 
