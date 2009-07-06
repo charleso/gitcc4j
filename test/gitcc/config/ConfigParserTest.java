@@ -41,7 +41,7 @@ public class ConfigParserTest extends TestCase {
 		assertEquals("email@test.com", user.getEmail());
 		assertEquals("password", user.getPassword());
 		assertEquals("hello", config.getUser("user2").getPassword());
-		assertEquals("baduser@example.com", config.getUser("baduser")
-				.getEmail());
+		assertEquals("baduser", config.getUser("baduser@example.com")
+				.getUsername());
 	}
 }

@@ -16,8 +16,8 @@ public class User {
 		this.email = email;
 	}
 
-	public User(String username, String suffix) {
-		this(username, username, username + "@" + suffix, null);
+	public User(String email) {
+		this(email.substring(0, email.indexOf('@')), email, email, null);
 	}
 
 	public void setView(String view) {

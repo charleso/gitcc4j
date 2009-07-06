@@ -183,7 +183,7 @@ public class Config {
 		if (user == null)
 			user = users.get(author.substring(0, author.indexOf('@')));
 		if (user == null)
-			user = new User(author, suffix);
+			user = new User(author);
 		return user;
 	}
 }

@@ -17,10 +17,11 @@ public class GitUtilTest extends TestCase {
 	}
 
 	public void testParseLog() {
-		String e = "abc\1Snapshot\n\0def\1Cooking\n\0ghi\1Initial";
+		String e = "abc\1user1\1Snapshot\n\0def\1user2\1Cooking\n\0ghi\1user3\1Initial";
 		List<GitCommit> commits = util.parseLog(e);
 		assertEquals(3, commits.size());
 		assertEquals("abc", commits.get(0).getId());
+		assertEquals("user1", commits.get(0).getAuthor());
 		assertEquals("Snapshot", commits.get(0).getMessage());
 	}
 

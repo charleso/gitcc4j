@@ -65,7 +65,6 @@ public class TransactionTest extends TestCase {
 		cc.checkin(".", message);
 		cc.checkin("m", message);
 		cc.checkin("r2", message);
-		git.tag("my_branch_ci", "sha");
 		process();
 	}
 

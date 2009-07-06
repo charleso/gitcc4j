@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 
-public class AbstractDaemonTest extends TestCase {
+public abstract class AbstractDaemonTest extends TestCase {
 
 	protected static final String GIT_FILE = "a";
 
@@ -88,7 +88,7 @@ public class AbstractDaemonTest extends TestCase {
 	protected void add(GitImpl git, String file) {
 		write(new File(git.getRoot(), file));
 		git.add(file);
-		User user = new User("a", "example.com");
+		User user = new User("a@example.com");
 		git.commit(new CCCommit("auth2", new Date(), "git"), user);
 	}
 
