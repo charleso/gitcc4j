@@ -1,8 +1,12 @@
 package gitcc.cmd;
 
 import gitcc.Log;
+import gitcc.git.GitCommit;
 import gitcc.util.CheckinException;
 import gitcc.util.EmailUtil;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * At the moment this is a simple loop of checkin + rebase + sleep.
@@ -64,7 +68,15 @@ public class Daemon extends Command {
 
 	private void checkin() throws Exception {
 		try {
-			exec(new Checkin());
+			exec(new Checkin() {
+				@Override
+				protected void checkin(List<GitCommit> log) {
+					GitCommit c = log.get(0);
+					cc = cc.cloneForUser(config.getUser(c.getAuthor()));
+					// Only checkin one at a time so we can change users
+					super.checkin(Arrays.asList(c));
+				}
+			});
 		} catch (CheckinException e) {
 			// Basically ignore this - we don't care
 			Log.debug(e.getMessage());

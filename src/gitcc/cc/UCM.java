@@ -31,6 +31,10 @@ public class UCM extends ClearcaseImpl {
 		stream = config.getStream();
 	}
 
+	protected UCM() {
+		super();
+	}
+
 	@Override
 	protected String getCommentFormat() {
 		return "%[activity]Xp";

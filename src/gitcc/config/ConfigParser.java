@@ -54,12 +54,15 @@ public class ConfigParser {
 	protected void parseUsers(Config config, Reader reader) throws Exception {
 		BufferedReader in = new BufferedReader(reader);
 		for (String line; (line = in.readLine()) != null;) {
-			String[] user = line.split(SEP);
-			if (user.length != 4) {
+			String[] split = line.split(SEP);
+			if (split.length < 4) {
 				Log.debug("Invalid user entry: " + line);
 				continue;
 			}
-			config.addUser(new User(user[0], user[1], user[2], user[3]));
+			User user = new User(split[0], split[1], split[2], split[3]);
+			if (split.length == 5)
+				user.setView(split[4]);
+			config.addUser(user);
 		}
 	}
 

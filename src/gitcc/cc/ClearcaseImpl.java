@@ -2,6 +2,7 @@ package gitcc.cc;
 
 import gitcc.Log;
 import gitcc.config.Config;
+import gitcc.config.User;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,47 +45,40 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	private static final String DATE_FORMAT = "dd-MMM-yyyy.HH:mm:ss";
 	private static final String RPC_PATH = "/TeamCcrc/ccrc/";
 
-	protected final Session session;
-	protected final CopyArea copyArea;
+	private Config config;
+	protected Session session;
 
-	private final CopyArea root;
-	private final CopyAreaFile[] files;
-	private final String[] branches;
-	private final String extraPath;
+	protected CopyArea copyArea;
+	private CopyArea root;
+	private CopyAreaFile[] files;
+	private String extraPath;
 
 	public ClearcaseImpl(Config config) {
+		this.config = config;
 		try {
 			String url = new URL(new URL(config.getUrl()), RPC_PATH).toString();
 			session = new Session(url, new Credentials(config));
-			String configPath = config.getClearcase();
-			root = new CopyAreaFile(new File(configPath)).getCopyArea();
-			extraPath = configPath.substring(root.getRoot().length() + 1)
-					+ File.separatorChar;
-			files = convert(config);
+			setRoot(config.getClearcase());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		copyArea = files[0].getCopyArea();
-		branches = config.getBranches();
 	}
 
-	private ClearcaseImpl(ClearcaseImpl cc, Session session) {
-		this.session = cc.session;
-		this.copyArea = cc.copyArea;
-		this.root = cc.root;
-		this.files = cc.files;
-		this.branches = cc.branches;
-		this.extraPath = cc.extraPath;
+	protected ClearcaseImpl() {
+		super();
 	}
 
-	private CopyAreaFile[] convert(Config config) throws Exception {
+	private void setRoot(String configPath) throws Exception {
+		root = new CopyAreaFile(new File(configPath)).getCopyArea();
+		extraPath = configPath.substring(root.getRoot().length() + 1)
+				+ File.separatorChar;
 		String[] includes = config.getInclude();
-		CopyAreaFile[] files = new CopyAreaFile[includes.length];
-		String _root = config.getClearcase();
+		files = new CopyAreaFile[includes.length];
 		for (int i = 0; i < includes.length; i++) {
-			files[i] = new CopyAreaFile(new File(new File(_root), includes[i]));
+			files[i] = new CopyAreaFile(new File(new File(configPath),
+					includes[i]));
 		}
-		return files;
+		copyArea = files[0].getCopyArea();
 	}
 
 	private CopyAreaFile[] singleFile(String file) {
@@ -212,7 +206,8 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 		}
 		String[] _args = (String[]) args.toArray(new String[args.size()]);
 		String lsh = cleartool("lshistory", _args);
-		Collection<CCCommit> commits = histParser.parse(lsh, branches);
+		Collection<CCCommit> commits = histParser.parse(lsh, config
+				.getBranches());
 		for (CCCommit commit : commits) {
 			for (CCFile f : commit.getFiles()) {
 				f.setFile(f.getFile().substring(extraPath.length()));
@@ -288,11 +283,21 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	}
 
 	@Override
-	public Clearcase getSession(Credentials credentials) {
-		if (credentials.getPassword() == null)
+	public Clearcase cloneForUser(User user) {
+		if (user == null || user.getPassword() == null)
 			return this;
-		Session session2 = new Session(session.getUrl(), credentials);
-		return new ClearcaseImpl(this, session2);
+		Credentials credentials = new Credentials(user.getUsername(), user
+				.getPassword(), config.getGroup());
+		try {
+			ClearcaseImpl cc = getClass().newInstance();
+			cc.config = config;
+			cc.session = new Session(session.getUrl(), credentials);
+			cc.setRoot(user.getView() == null ? user.getView() : config
+					.getClearcase());
+			return cc;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void debug(String s) {

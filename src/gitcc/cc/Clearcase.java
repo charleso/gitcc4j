@@ -1,5 +1,7 @@
 package gitcc.cc;
 
+import gitcc.config.User;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Date;
@@ -43,5 +45,5 @@ public interface Clearcase {
 
 	File toFile(String file);
 
-	Clearcase getSession(Credentials credentials);
+	Clearcase cloneForUser(User user);
 }

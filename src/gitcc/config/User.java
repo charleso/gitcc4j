@@ -6,6 +6,7 @@ public class User {
 	private final String name;
 	private final String password;
 	private final String email;
+	private String view;
 
 	public User(String username, String name, String email, String password) {
 		super();
@@ -17,6 +18,10 @@ public class User {
 
 	public User(String username, String suffix) {
 		this(username, username, username + "@" + suffix, null);
+	}
+
+	public void setView(String view) {
+		this.view = view;
 	}
 
 	public String getUsername() {
@@ -33,5 +38,9 @@ public class User {
 
 	public String getEmail() {
 		return email;
+	}
+
+	public String getView() {
+		return view;
 	}
 }
