@@ -92,6 +92,10 @@ public class ConfigParser {
 			Class<?> type = m.getParameterTypes()[0];
 			if (String[].class.isAssignableFrom(type))
 				value = svalue.split(SEP);
+			else if (Boolean.TYPE.isAssignableFrom(type))
+				value = Boolean.parseBoolean(svalue);
+			else if (Integer.TYPE.isAssignableFrom(type))
+				value = Integer.parseInt(svalue);
 			try {
 				m.invoke(config, value);
 			} catch (Exception e) {
