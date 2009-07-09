@@ -30,31 +30,33 @@ Config
 Pretty much the same as the python version, which a few extra annoying UCM ones
 which I can't seem to avoid.
 
-[core]
-type = UCM
-include = folderA|folderB/folderC
+::
 
-# This is a new feature for UCM to allow gitcc to handle renames across
-# components as well as .gitignore files in the root folder
-ignore.level = 1
+ [core]
+ type = UCM
+ include = folderA|folderB/folderC
 
-# These are for CCRC
-url = http://clearcasewebserver:12080/
-username = charleso 
-password = password
-group = somegroup
+ # This is a new feature for UCM to allow gitcc to handle renames across
+ # components as well as .gitignore files in the root folder
+ ignore.level = 1
 
-# These are for the daemon to email when something goes wrong
-email.recipients = foo@example.com|bar@example.com
-email.sender = charleso@charleso.org
-email.smtp = smpt.example.com
+ # These are for CCRC
+ url = http://clearcasewebserver:12080/
+ username = charleso 
+ password = password
+ group = somegroup
 
-[master]
-clearcase = /views/test/prod
-branches = branch_a|branch_b
-# These are new - there must be an easy way to work them out via the API
-integration = /views/test_int/prod
-stream = dbid:110825@replicauuid:a0bc60b03c1011dd94080002cea84b4c
+ # These are for the daemon to email when something goes wrong
+ email.recipients = foo@example.com|bar@example.com
+ email.sender = charleso@charleso.org
+ email.smtp = smpt.example.com
+
+ [master]
+ clearcase = /views/test/prod
+ branches = branch_a|branch_b
+ # These are new - there must be an easy way to work them out via the API
+ integration = /views/test_int/prod
+ stream = dbid:110825@replicauuid:a0bc60b03c1011dd94080002cea84b4c
 
 Users
 =====
@@ -62,5 +64,7 @@ Users
 This goes in the .git/users files. You don't really need the extra view
 information. This is just a requirement at my work.
 
-Charles O'Farrell|charleso@charles.org|password|/views/charleso
-Joe Smith|joe@smith.com|password|/views/joes
+::
+
+ Charles O'Farrell|charleso@charles.org|password|/views/charleso
+ Joe Smith|joe@smith.com|password|/views/joes
