@@ -30,7 +30,7 @@ public class Transaction extends Common {
 
 	public void process() {
 		activity = cc.mkact(GitCommit.getSubject(commit));
-		mergeBase = git.mergeBase(config.getCI(), "HEAD");
+		mergeBase = git.mergeBase(config.getCI(), config.getBranch());
 		try {
 			phase1();
 			mkdirs();
