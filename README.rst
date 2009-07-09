@@ -14,7 +14,7 @@ The reason for this clone is that I switched to Ubuntu at work recently and
 could not longer call cleartool commands, as Clearcase requires a specific and
 older version of the kernel. As an alternative Rational offer Clearcase Remote
 Client (CCRC) which is a Java based Clearcase alternative. Essentially this is
-just an Java/Eclipse front-end to a bunch of webservices backed by a _real_
+just an Java/Eclipse front-end to a bunch of webservices backed by a *real*
 Clearcase server.
 
 One of the things I've been able to achieve in this version that I have
@@ -27,7 +27,7 @@ Death to Clearcase!
 Config
 ======
 
-Pretty much the same as the python version, which a few extra annoying UCM ones
+Pretty much the same as the python version, with a few extra annoying UCM ones
 which I can't seem to avoid.
 
 ::
