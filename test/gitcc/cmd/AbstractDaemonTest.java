@@ -70,7 +70,9 @@ public abstract class AbstractDaemonTest extends TestCase {
 	}
 
 	private void _singlePass() throws Exception {
-		CCCommit commit = new CCCommit("auth1", new Date(), "cc");
+		CCCommit commit = new CCCommit("auth1@test", new Date(), "cc");
+		User user = (User) EasyMock.anyObject();
+		EasyMock.expect(cc.cloneForUser(user)).andReturn(cc);
 		Date date = EasyMock.anyObject();
 		expect(cc.getHistory(date)).andReturn(Arrays.asList(commit));
 		get(cc, commit);
@@ -89,7 +91,7 @@ public abstract class AbstractDaemonTest extends TestCase {
 		write(new File(git.getRoot(), file));
 		git.add(file);
 		User user = new User("a@example.com");
-		git.commit(new CCCommit("auth2", new Date(), "git"), user);
+		git.commit(new CCCommit("auth2@test", new Date(), "git"), user);
 	}
 
 	private void write(File tmp) {

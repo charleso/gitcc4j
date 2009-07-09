@@ -32,9 +32,10 @@ public class TransactionTest extends TestCase {
 		cc = t.cc = ctrl.createMock(Clearcase.class);
 		git = t.git = ctrl.createMock(Git.class);
 		config = t.config = new Config();
-		config.setBranch("my_branch");
+		String branch = "my_branch";
+		config.setBranch(branch);
 		EasyMock.expect(cc.mkact("x")).andReturn("act");
-		EasyMock.expect(git.mergeBase("my_branch_ci", "HEAD"))
+		EasyMock.expect(git.mergeBase(branch + "_ci", branch))
 				.andReturn("base");
 	}
 
