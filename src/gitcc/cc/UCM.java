@@ -165,5 +165,13 @@ public class UCM extends ClearcaseImpl {
 		public boolean toBeCompleted() {
 			return status == 12;
 		}
+
+		public boolean isCompleted() {
+			return status == 19;
+		}
+
+		public boolean noWorkRequired() {
+			return status == 1;
+		}
 	};
 }
