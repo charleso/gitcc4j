@@ -11,7 +11,7 @@ public class Config {
 
 	private String suffix = "example.com";
 	private String branch;
-	private boolean debug = true;
+	private int debugLevel = 1;
 	private String[] include = new String[] { "." };
 	private String[] branches = new String[] { "main" };
 	private String clearcase;
@@ -38,8 +38,8 @@ public class Config {
 		this.branch = branch;
 	}
 
-	public void setDebug(boolean debug) {
-		this.debug = debug;
+	public void setDebugLevel(int level) {
+		this.debugLevel = level;
 	}
 
 	public void setInclude(String[] include) {
@@ -90,8 +90,8 @@ public class Config {
 		return _getBranch() + "_ci";
 	}
 
-	public boolean isDebug() {
-		return debug;
+	public int getDebugLevel() {
+		return debugLevel;
 	}
 
 	public String getBranch() {

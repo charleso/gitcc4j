@@ -32,7 +32,7 @@ public class Gitcc {
 		Command command = getCommand(type);
 
 		Config config = command.config = new Config();
-		Log.setDebug(config.isDebug());
+		Log.setLevel(config.getDebugLevel());
 		Git git = command.git = new GitImpl(findGitRoot());
 		command.init();
 		config.setBranch(git.getBranch());

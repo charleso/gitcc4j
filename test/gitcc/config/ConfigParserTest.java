@@ -13,7 +13,7 @@ public class ConfigParserTest extends TestCase {
 				+ "#group = ignoreme         \n"
 				+ "branches = b|c            \n"
 				+ "url = http://test.com/    \n"
-				+ "debug = false             \n"
+				+ "debugLevel = 2            \n"
 				+ "[master]                  \n"
 				+ "clearcase = a             \n"
 				+ "[test]                    \n"
@@ -24,7 +24,7 @@ public class ConfigParserTest extends TestCase {
 		assertEquals("[b, c]", Arrays.asList(config.getBranches()).toString());
 		assertEquals("a", config.getClearcase());
 		assertNull(config.getGroup());
-		assertFalse(config.isDebug());
+		assertEquals(2, config.getDebugLevel());
 	}
 
 	public void testProcessName() {

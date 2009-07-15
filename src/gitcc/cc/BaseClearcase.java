@@ -60,7 +60,7 @@ public class BaseClearcase {
 						m.getParameterTypes()).invoke(object, args);
 			} catch (NoSuchMethodException e) {
 				String line = m.getName() + "(" + Arrays.asList(args) + ")";
-				Log.debug(line);
+				Log.trace(line);
 				return null;
 			}
 		}

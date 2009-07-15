@@ -2,10 +2,10 @@ package gitcc;
 
 public class Log {
 
-	private static boolean debug;
+	private static int level;
 
 	public static void debug(String string) {
-		if (debug) {
+		if (level >= 1) {
 			System.out.println(string);
 		}
 	}
@@ -14,7 +14,13 @@ public class Log {
 		System.out.println(info);
 	}
 
-	public static void setDebug(boolean debug2) {
-		Log.debug = debug2;
+	public static void setLevel(int level) {
+		Log.level = level;
+	}
+
+	public static void trace(String string) {
+		if (level >= 2) {
+			System.out.println(string);
+		}
 	}
 }
