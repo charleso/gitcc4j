@@ -67,7 +67,7 @@ public class Rebase extends Command {
 			return;
 		fileHandler.copyFile(new File(git.getRoot(), f.getFile()));
 		try {
-			git.add(f.getFile());
+			git.addForce(f.getFile());
 		} catch (ExecException e) {
 			if (e.getMessage().contains("The following paths are ignored"))
 				return;

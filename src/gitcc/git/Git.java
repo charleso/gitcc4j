@@ -11,7 +11,7 @@ public interface Git {
 
 	String HEAD = "HEAD";
 
-	void add(String file);
+	void addForce(String file);
 
 	void remove(String file);
 

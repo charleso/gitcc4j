@@ -89,7 +89,7 @@ public abstract class AbstractDaemonTest extends TestCase {
 
 	protected void add(GitImpl git, String file) {
 		write(new File(git.getRoot(), file));
-		git.add(file);
+		git.addForce(file);
 		User user = new User("a@example.com");
 		git.commit(new CCCommit("auth2@test", new Date(), "git"), user);
 	}
