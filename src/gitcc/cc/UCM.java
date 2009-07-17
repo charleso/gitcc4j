@@ -159,7 +159,7 @@ public class UCM extends ClearcaseImpl {
 		}
 
 		public boolean inProgress() {
-			return status == 1001;
+			return status == -1;
 		}
 
 		public boolean toBeCompleted() {
