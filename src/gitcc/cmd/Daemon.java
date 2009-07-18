@@ -26,8 +26,9 @@ import java.util.List;
  */
 public class Daemon extends Command {
 
+	private static final String SINCE = "gitcc.since";
+
 	private EmailUtil email;
-	private Date since;
 
 	@Override
 	public void init() {
@@ -114,8 +115,14 @@ public class Daemon extends Command {
 
 			@Override
 			protected Date getSince() {
+				Date since = null;
+				try {
+					since = new Date(Long.parseLong(git.getConfig(SINCE)));
+				} catch (Exception e) {
+					// Ignore
+				}
 				Date temp = since != null ? since : super.getSince();
-				since = new Date();
+				git.setConfig(SINCE, Long.toString(new Date().getTime()));
 				return temp;
 			}
 		});

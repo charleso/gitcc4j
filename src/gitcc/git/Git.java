@@ -49,5 +49,7 @@ public interface Git {
 
 	void setConfig(String name, String value);
 
+	String getConfig(String name);
+
 	void merge(String remote);
 }

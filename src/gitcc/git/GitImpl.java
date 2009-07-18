@@ -142,4 +142,9 @@ public class GitImpl extends Exec implements Git {
 	public void setConfig(String name, String value) {
 		exec("config", name, value);
 	}
+
+	@Override
+	public String getConfig(String name) {
+		return exec("config", name);
+	}
 }
