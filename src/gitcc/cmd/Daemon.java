@@ -108,6 +108,7 @@ public class Daemon extends Command {
 						git.checkout(branch);
 						git.merge(branch_cc);
 					}
+					git.gc();
 				} finally {
 					git.checkoutForce(branch_cc);
 				}

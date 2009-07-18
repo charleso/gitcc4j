@@ -52,4 +52,6 @@ public interface Git {
 	String getConfig(String name);
 
 	void merge(String remote);
+
+	void gc();
 }
