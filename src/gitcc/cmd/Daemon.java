@@ -105,7 +105,7 @@ public class Daemon extends Command {
 			protected void doRebase() {
 				String branch_cc = config.getCC();
 				try {
-					git.rebase(config.getCI(), branch_cc);
+					rebase(branch_cc);
 					String branch = config.getBranch();
 					if (sanityCheck(branch, branch_cc)) {
 						git.checkout(branch);
@@ -115,6 +115,20 @@ public class Daemon extends Command {
 					git.gc();
 				} finally {
 					git.checkoutForce(branch_cc);
+				}
+			}
+
+			/**
+			 * ClearCase may have a slightly different version of events if a
+			 * file was modified and then deleted. By comparing the tree we can
+			 * avoid unnecessary rebase errors.
+			 */
+			private void rebase(String branch_cc) {
+				String ci = config.getCI();
+				if (git.diffTree(ci, branch_cc).length() == 0) {
+					git.resetHard(ci);
+				} else {
+					git.rebase(ci, branch_cc);
 				}
 			}
 

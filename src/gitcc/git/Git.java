@@ -54,4 +54,8 @@ public interface Git {
 	void merge(String remote);
 
 	void gc();
+
+	String diffTree(String commit1, String commit2);
+
+	void resetHard(String treeish);
 }

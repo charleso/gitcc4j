@@ -152,4 +152,14 @@ public class GitImpl extends Exec implements Git {
 	public void gc() {
 		exec("gc");
 	}
+
+	@Override
+	public String diffTree(String commit1, String commit2) {
+		return exec("diff-tree", commit1, commit2);
+	}
+
+	@Override
+	public void resetHard(String treeish) {
+		exec("reset", "--hard", treeish);
+	}
 }
