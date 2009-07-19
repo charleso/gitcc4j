@@ -98,6 +98,9 @@ public class Daemon extends Command {
 
 	private void rebase() throws Exception {
 		exec(new Rebase() {
+
+			private long since;
+
 			@Override
 			protected void doRebase() {
 				String branch_cc = config.getCC();
@@ -108,6 +111,7 @@ public class Daemon extends Command {
 						git.checkout(branch);
 						git.merge(branch_cc);
 					}
+					git.setConfig(SINCE, Long.toString(since));
 					git.gc();
 				} finally {
 					git.checkoutForce(branch_cc);
@@ -116,15 +120,14 @@ public class Daemon extends Command {
 
 			@Override
 			protected Date getSince() {
-				Date since = null;
+				Date lastSince = null;
 				try {
-					since = new Date(Long.parseLong(git.getConfig(SINCE)));
+					lastSince = new Date(Long.parseLong(git.getConfig(SINCE)));
 				} catch (Exception e) {
 					// Ignore
 				}
-				Date temp = since != null ? since : super.getSince();
-				git.setConfig(SINCE, Long.toString(new Date().getTime()));
-				return temp;
+				since = new Date().getTime();
+				return lastSince != null ? lastSince : super.getSince();
 			}
 		});
 	}
