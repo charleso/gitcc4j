@@ -3,10 +3,10 @@ package gitcc.cmd;
 import gitcc.Log;
 import gitcc.config.Config;
 import gitcc.git.GitCommit;
+import gitcc.git.GitUtil;
 import gitcc.util.CheckinException;
 import gitcc.util.EmailUtil;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -78,9 +78,10 @@ public class Daemon extends Command {
 				@Override
 				protected void checkin(List<GitCommit> log) throws Exception {
 					// Only checkin one at a time so we can change users
-					for (GitCommit c : log) {
+					for (List<GitCommit> l : GitUtil.splitLogByUser(log)) {
+						GitCommit c = l.get(0);
 						cc = cc.cloneForUser(config.getUser(c.getAuthor()));
-						super.checkin(Arrays.asList(c));
+						super.checkin(l);
 					}
 				}
 

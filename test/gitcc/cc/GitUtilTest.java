@@ -4,6 +4,7 @@ import gitcc.git.FileStatus;
 import gitcc.git.GitCommit;
 import gitcc.git.GitUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -49,5 +50,25 @@ public class GitUtilTest extends TestCase {
 
 	public void testParseBranch() {
 		assertEquals("master", util.parseBranch("* master\n  test\n"));
+	}
+
+	public void testSplitLogByUser() {
+		List<GitCommit> log = new ArrayList<GitCommit>();
+		log.add(new GitCommit(null, "a", null));
+		log.add(new GitCommit(null, "a", null));
+		log.add(new GitCommit(null, "b", null));
+		log.add(new GitCommit(null, "b", null));
+		log.add(new GitCommit(null, "c", null));
+		log.add(new GitCommit(null, "b", null));
+		log.add(new GitCommit(null, "a", null));
+		List<List<GitCommit>> l2 = GitUtil.splitLogByUser(log);
+		String s = "";
+		for (List<GitCommit> l : l2) {
+			for (GitCommit c : l) {
+				s += c.getAuthor();
+			}
+			s += "|";
+		}
+		assertEquals("aa|bb|c|b|a|", s);
 	}
 }

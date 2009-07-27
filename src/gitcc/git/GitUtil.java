@@ -69,4 +69,19 @@ public class GitUtil {
 		}
 		return null;
 	}
+
+	public static List<List<GitCommit>> splitLogByUser(List<GitCommit> log) {
+		List<List<GitCommit>> l = new ArrayList<List<GitCommit>>();
+		String last = null;
+		int i = -1;
+		for (GitCommit c : log) {
+			if (!c.getAuthor().equals(last)) {
+				l.add(new ArrayList<GitCommit>());
+				last = c.getAuthor();
+				i++;
+			}
+			l.get(i).add(c);
+		}
+		return l;
+	}
 }
