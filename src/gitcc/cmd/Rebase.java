@@ -83,8 +83,13 @@ public class Rebase extends Command {
 	}
 
 	private void remove(CCFile f) {
-		if (new File(git.getRoot(), f.getFile()).exists())
-			git.remove(f.getFile());
+		if (new File(git.getRoot(), f.getFile()).exists()) {
+			try {
+				git.remove(f.getFile());
+			} catch (ExecException e) {
+				// Ignore
+			}
+		}
 	}
 
 	private abstract class FileHandler {
