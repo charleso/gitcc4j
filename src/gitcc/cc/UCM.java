@@ -3,6 +3,7 @@ package gitcc.cc;
 import gitcc.Log;
 import gitcc.config.Config;
 import gitcc.config.User;
+import gitcc.util.ExecException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -127,7 +128,9 @@ public class UCM extends ClearcaseImpl {
 	public void deliver() {
 		run(new Update(session, new UpdateListener(), integeration,
 				HIJACK_TREATMENT, false));
-		_deliver(DeliverStream.OperationType.DELIVER_START);
+		if (!_deliver(DeliverStream.OperationType.DELIVER_START)
+				.toBeCompleted())
+			throw new ExecException("An error occured on deliver");
 		_deliver(DeliverStream.OperationType.DELIVER_COMPLETE);
 	}
 
@@ -136,10 +139,12 @@ public class UCM extends ClearcaseImpl {
 		new BaselineUtil(session, config.getStream()).run();
 	}
 
-	private void _deliver(DeliverStream.OperationType type) {
-		DeliverStream.UI _ui = log(DeliverStream.UI.class, new UI());
+	private UI _deliver(DeliverStream.OperationType type) {
+		UI ui = new UI();
+		DeliverStream.UI _ui = log(DeliverStream.UI.class, ui);
 		run(new DeliverStream(type, session, _ui, integeration, copyArea, true,
 				false, null));
+		return ui;
 	}
 
 	private static class UI {
