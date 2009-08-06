@@ -23,6 +23,11 @@ public class GitImpl extends Exec implements Git {
 	}
 
 	@Override
+	public void add(String file) {
+		exec("add", "--", file);
+	}
+
+	@Override
 	public void addForce(String file) {
 		exec("add", "-f", "--", file);
 	}

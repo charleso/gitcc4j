@@ -65,9 +65,11 @@ public class Rebase extends Command {
 		FileHandler fileHandler = getFile(all, f);
 		if (fileHandler.getNewFile() == null)
 			return;
-		fileHandler.copyFile(new File(git.getRoot(), f.getFile()));
+		File dest = new File(git.getRoot(), f.getFile());
+		dest.getParentFile().mkdirs();
+		fileHandler.copyFile(dest);
 		try {
-			git.addForce(f.getFile());
+			fileHandler.add(f.getFile());
 		} catch (ExecException e) {
 			if (e.getMessage().contains("The following paths are ignored"))
 				return;
@@ -102,6 +104,8 @@ public class Rebase extends Command {
 
 		public abstract void copyFile(File dest) throws Exception;
 
+		public abstract void add(String dest) throws Exception;
+
 		public File getNewFile() {
 			return newFile;
 		}
@@ -117,7 +121,6 @@ public class Rebase extends Command {
 		public void copyFile(File dest) throws Exception {
 			if (dest.exists() && !dest.delete())
 				throw new RuntimeException("Could not delete file: " + dest);
-			dest.getParentFile().mkdirs();
 			if (!newFile.renameTo(dest)) {
 				try {
 					IOUtils.copy(new FileInputStream(newFile),
@@ -126,6 +129,11 @@ public class Rebase extends Command {
 					newFile.delete();
 				}
 			}
+		}
+
+		@Override
+		public void add(String file) throws Exception {
+			git.addForce(file);
 		}
 	}
 
@@ -160,6 +168,11 @@ public class Rebase extends Command {
 				IOUtils.copy(new FileInputStream(newFile),
 						new FileOutputStream(dest));
 			}
+		}
+
+		@Override
+		public void add(String file) throws Exception {
+			git.add(file);
 		}
 	}
 }
