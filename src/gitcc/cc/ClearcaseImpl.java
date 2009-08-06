@@ -133,6 +133,7 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 
 	@Override
 	public void checkin(String file, String message) {
+		debug("checkin -c \"" + message + "\" " + file);
 		Item item = new Item(copyFile(file), message, (String) null);
 		run(new Checkin(session, log(Checkin.Listener.class), true,
 				new Item[] { item }));
