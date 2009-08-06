@@ -29,18 +29,25 @@ public class Checkin extends Command {
 		cc.update();
 		int count = 0;
 		for (GitCommit c : log) {
-			List<FileStatus> statuses = git.getStatuses(c);
-			statuses = ignoreLevel.filter(statuses);
-			if (!statuses.isEmpty()) {
-				init(new Transaction(c, statuses)).process();
-				count++;
-			}
+			count = checkin(c, count);
 			git.branchForce(config.getCI(), c.getId());
 		}
 		if (count > 0) {
 			cc.deliver();
 			makeBaseline();
 		}
+	}
+
+	private int checkin(GitCommit c, int count) {
+		if (c.getMessage().startsWith("***"))
+			return count;
+		List<FileStatus> statuses = git.getStatuses(c);
+		statuses = ignoreLevel.filter(statuses);
+		if (!statuses.isEmpty()) {
+			init(new Transaction(c, statuses)).process();
+			count++;
+		}
+		return count;
 	}
 
 	protected void makeBaseline() {
