@@ -48,6 +48,7 @@ public class Daemon extends Command {
 				} catch (Exception e) {
 					e.printStackTrace();
 					email.send(e);
+					System.exit(1);
 				}
 			} else {
 				String error = "Repository is in a bad state. Wake me up when you fix it.";
