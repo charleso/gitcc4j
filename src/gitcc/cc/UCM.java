@@ -13,7 +13,7 @@ import com.ibm.rational.clearcase.remote_core.cmds.CreateActivity;
 import com.ibm.rational.clearcase.remote_core.cmds.GetMyActivities;
 import com.ibm.rational.clearcase.remote_core.cmds.SetCurrentActivity;
 import com.ibm.rational.clearcase.remote_core.cmds.properties.GetActivityProperties;
-import com.ibm.rational.clearcase.remote_core.cmds.sync.Update;
+import com.ibm.rational.clearcase.remote_core.cmds.sync.SyncViewFromStream;
 import com.ibm.rational.clearcase.remote_core.copyarea.CopyArea;
 import com.ibm.rational.clearcase.remote_core.integration.DeliverStream;
 import com.ibm.rational.clearcase.remote_core.integration.PrepareRebase;
@@ -126,8 +126,8 @@ public class UCM extends ClearcaseImpl {
 	}
 
 	public void deliver() {
-		run(new Update(session, new UpdateListener(), integeration,
-				HIJACK_TREATMENT, false));
+		run(new SyncViewFromStream(session, new UpdateListener(), integeration,
+				HIJACK_TREATMENT));
 		if (!_deliver(DeliverStream.OperationType.DELIVER_START)
 				.toBeCompleted())
 			throw new ExecException("An error occured on deliver");
