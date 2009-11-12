@@ -41,7 +41,6 @@ public class Daemon extends Command {
 
 	@Override
 	public void execute() throws Exception {
-		git.checkout(config.getCC());
 		while (true) {
 			if (sanityCheck(config.getCC(), config.getBranch())) {
 				try {
@@ -70,8 +69,10 @@ public class Daemon extends Command {
 	}
 
 	protected void singlePass() throws Exception {
+		pull();
 		checkin();
 		rebase();
+		push();
 	}
 
 	private void checkin() throws Exception {
@@ -104,6 +105,7 @@ public class Daemon extends Command {
 	}
 
 	private void rebase() throws Exception {
+		git.checkout(config.getCC());
 		exec(new Rebase() {
 
 			private long since;
@@ -151,6 +153,20 @@ public class Daemon extends Command {
 				return lastSince != null ? lastSince : super.getSince();
 			}
 		});
+	}
+
+	private void pull() {
+		if (config.getRemote() != null) {
+			git.checkout(config.getBranch());
+			git.pullRebase(config.getRemote());
+		}
+	}
+
+	private void push() {
+		if (config.getRemote() != null) {
+			git.checkout(config.getBranch());
+			git.push(config.getRemote());
+		}
 	}
 
 	private void exec(Command cmd) throws Exception {

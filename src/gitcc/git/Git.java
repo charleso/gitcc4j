@@ -60,4 +60,8 @@ public interface Git {
 	String diffTree(String commit1, String commit2);
 
 	void resetHard(String treeish);
+
+	void pullRebase(String remote);
+
+	void push(String remote);
 }

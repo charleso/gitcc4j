@@ -167,4 +167,14 @@ public class GitImpl extends Exec implements Git {
 	public void resetHard(String treeish) {
 		exec("reset", "--hard", treeish);
 	}
+
+	@Override
+	public void pullRebase(String remote) {
+		exec("pull", "--rebase", remote);
+	}
+
+	@Override
+	public void push(String remote) {
+		exec("push", remote);
+	}
 }

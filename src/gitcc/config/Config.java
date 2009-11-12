@@ -26,6 +26,7 @@ public class Config {
 	private String group;
 	private String integration;
 	private String stream;
+	private String remote;
 
 	private String smtp;
 	private String sender;
@@ -211,5 +212,13 @@ public class Config {
 		if (user == null)
 			user = users.get(author.substring(0, author.indexOf('@')));
 		return user;
+	}
+
+	public String getRemote() {
+		return remote;
+	}
+
+	public void setRemote(String remote) {
+		this.remote = remote;
 	}
 }
