@@ -2,6 +2,7 @@ package gitcc.cmd;
 
 import gitcc.Log;
 import gitcc.config.Config;
+import gitcc.config.User;
 import gitcc.git.GitCommit;
 import gitcc.git.GitUtil;
 import gitcc.util.CheckinException;
@@ -81,7 +82,11 @@ public class Daemon extends Command {
 					// Only checkin one at a time so we can change users
 					for (List<GitCommit> l : GitUtil.splitLogByUser(log)) {
 						GitCommit c = l.get(0);
-						cc = cc.cloneForUser(config.getUser(c.getAuthor()));
+						User user = config.getUserByEmail(c.getAuthor());
+						if (user == null)
+							throw new RuntimeException("User not found: "
+									+ c.getAuthor());
+						cc = cc.cloneForUser(user);
 						super.checkin(l);
 					}
 				}

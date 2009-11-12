@@ -4,6 +4,7 @@ import gitcc.config.Config;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -29,10 +30,10 @@ public class EmailUtil {
 				.getEmailSender());
 		msg.setFrom(addressFrom);
 
-		String[] recipients = config.getEmailRecipients();
-		InternetAddress[] addressTo = new InternetAddress[recipients.length];
-		for (int i = 0; i < recipients.length; i++) {
-			addressTo[i] = new InternetAddress(recipients[i]);
+		List<String> recipients = config.getAllEmails();
+		InternetAddress[] addressTo = new InternetAddress[recipients.size()];
+		for (int i = 0; i < recipients.size(); i++) {
+			addressTo[i] = new InternetAddress(recipients.get(i));
 		}
 		msg.setRecipients(Message.RecipientType.TO, addressTo);
 

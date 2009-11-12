@@ -1,6 +1,9 @@
 package gitcc.config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Config {
@@ -170,6 +173,15 @@ public class Config {
 		this.recipients = recipients;
 	}
 
+	public List<String> getAllEmails() {
+		List<String> emails = new ArrayList<String>();
+		emails.addAll(Arrays.asList(recipients));
+		for(User user : users.values()) {
+			emails.add(user.getEmail());
+		}
+		return emails;
+	}
+
 	public String getEmailSender() {
 		return sender;
 	}
@@ -190,9 +202,14 @@ public class Config {
 	public User getUser(String author) {
 		User user = users.get(author);
 		if (user == null)
-			user = users.get(author.substring(0, author.indexOf('@')));
+			user = getUserByEmail(author + "@" + suffix);
+		return user;
+	}
+
+	public User getUserByEmail(String author) {
+		User user = users.get(author);
 		if (user == null)
-			user = new User(author);
+			user = users.get(author.substring(0, author.indexOf('@')));
 		return user;
 	}
 }
