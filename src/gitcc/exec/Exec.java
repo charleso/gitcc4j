@@ -25,15 +25,27 @@ public class Exec {
 		return _exec(null, args);
 	}
 
-	public byte[] _exec(String[] env, String... args) {
+	private String[] preExec(String... args) {
 		String[] _args = new String[args.length + cmd.length];
 		System.arraycopy(args, 0, _args, cmd.length, args.length);
 		for (int i = 0; i < cmd.length; i++) {
 			_args[i] = cmd[i];
 		}
 		debug(_args);
+		return _args;
+	}
+
+	protected Process startProcess(String[] env, String... args) {
 		try {
-			Process process = Runtime.getRuntime().exec(_args, env, root);
+			return Runtime.getRuntime().exec(preExec(args), env, root);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public byte[] _exec(String[] env, String... args) {
+		try {
+			Process process = startProcess(env, args);
 			byte[] stdout = getBytes(process.getInputStream());
 			String error = new String(getBytes(process.getErrorStream()));
 			if (process.waitFor() > 0) {

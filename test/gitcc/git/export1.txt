@@ -1,0 +1,14 @@
+blob
+mark :1
+data 3
+xyz
+
+commit refs/heads/master
+mark :2
+author test@example.com <test@example.com> 12345
+committer test@example.com <test@example.com> 12345
+data 8
+message1
+M 100644 :1 a/b/c
+D d/e/f
+

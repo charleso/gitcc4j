@@ -6,6 +6,7 @@ import gitcc.exec.Exec;
 import gitcc.util.ExecException;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +35,7 @@ public class GitImpl extends Exec implements Git {
 
 	@Override
 	public void remove(String file) {
-		exec("rm", "-r", "--", file);
+		exec("rm", "--", file);
 	}
 
 	@Override
@@ -176,5 +177,10 @@ public class GitImpl extends Exec implements Git {
 	@Override
 	public void push(String remote) {
 		exec("push", remote);
+	}
+
+	@Override
+	public OutputStream fastImport() {
+		return startProcess(new String[0]).getOutputStream();
 	}
 }

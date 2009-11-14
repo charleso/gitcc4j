@@ -89,6 +89,11 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 		return new CopyAreaFile(root, extraPath + file);
 	}
 
+	@Override
+	public File getRoot() {
+		return new File(root.getRoot(), extraPath);
+	}
+
 	public File toFile(String file) {
 		return copyFile(file);
 	}

@@ -48,4 +48,6 @@ public interface Clearcase {
 	Clearcase cloneForUser(User user) throws Exception;
 
 	void makeBaseline();
+
+	File getRoot();
 }

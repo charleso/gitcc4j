@@ -4,6 +4,7 @@ import gitcc.cc.CCCommit;
 import gitcc.config.User;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -64,4 +65,6 @@ public interface Git {
 	void pullRebase(String remote);
 
 	void push(String remote);
+
+	OutputStream fastImport();
 }

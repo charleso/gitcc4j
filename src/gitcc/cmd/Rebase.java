@@ -3,17 +3,21 @@ package gitcc.cmd;
 import gitcc.cc.CCCommit;
 import gitcc.cc.CCFile;
 import gitcc.cc.CCFile.Status;
+import gitcc.git.FastImport;
+import gitcc.git.Import;
 import gitcc.util.ExecException;
-import gitcc.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 public class Rebase extends Command {
+
+	private Import imp;
 
 	@Override
 	public void execute() throws Exception {
@@ -24,19 +28,27 @@ public class Rebase extends Command {
 		Collection<CCCommit> commits = cc.getHistory(since);
 		if (commits.isEmpty())
 			return;
-		// TODO Git fast import
-		if (normal)
-			git.checkout(config.getCC());
-		for (CCCommit c : commits) {
-			handleFiles(c.getFiles(), c.getFiles());
-			git.commit(c, config.getUser(c.getAuthor()));
-		}
+		doImport(normal, commits);
 		if (normal) {
 			doRebase();
 		} else {
 			git.branch(config.getCC());
 		}
 		git.branchForce(config.getCI(), config.getCC());
+	}
+
+	private void doImport(boolean normal, Collection<CCCommit> commits) {
+		imp = new FastImport(git.fastImport());
+		try {
+			if (normal)
+				imp.checkout(config.getCC());
+			for (CCCommit c : commits) {
+				handleFiles(c.getFiles());
+				imp.commit(c, config.getUser(c.getAuthor()));
+			}
+		} finally {
+			imp.close();
+		}
 	}
 
 	protected Date getSince() {
@@ -48,131 +60,73 @@ public class Rebase extends Command {
 		git.rebase(config.getCC(), config.getBranch());
 	}
 
-	private void handleFiles(List<CCFile> all, List<CCFile> files)
-			throws Exception {
+	private void handleFiles(List<CCFile> files) {
 		for (CCFile f : files) {
 			if (f.getStatus() == Status.Directory) {
-				handleFiles(all, cc.diffPred(f));
+				handleFiles(cc.diffPred(f));
 			} else if (f.getStatus() == Status.Added) {
-				add(all, f);
+				add(f);
 			} else {
 				remove(f);
 			}
 		}
 	}
 
-	private void add(List<CCFile> all, CCFile f) throws Exception {
-		FileHandler fileHandler = getFile(all, f);
-		if (fileHandler.getNewFile() == null)
+	private void add(CCFile f) {
+		final File newFile = getFile(f);
+		if (!newFile.exists())
 			return;
-		File dest = new File(git.getRoot(), f.getFile());
-		dest.getParentFile().mkdirs();
-		fileHandler.copyFile(dest);
-		try {
-			fileHandler.add(f.getFile());
-		} catch (ExecException e) {
-			if (e.getMessage().contains("The following paths are ignored"))
-				return;
-			throw e;
-		}
-	}
-
-	private FileHandler getFile(List<CCFile> all, CCFile f) {
-		if (!f.hasVersion()) {
-			return new RenameHandler(all, f);
-		}
-		return new VersionHandler(f);
-	}
-
-	private void remove(CCFile f) {
-		if (new File(git.getRoot(), f.getFile()).exists()) {
-			try {
-				git.remove(f.getFile());
-			} catch (ExecException e) {
-				// Ignore
-			}
-		}
-	}
-
-	private abstract class FileHandler {
-
-		protected File newFile;
-
-		public void setFile(File file) {
-			newFile = file;
-		}
-
-		public abstract void copyFile(File dest) throws Exception;
-
-		public abstract void add(String dest) throws Exception;
-
-		public File getNewFile() {
-			return newFile;
-		}
-	}
-
-	private class VersionHandler extends FileHandler {
-
-		public VersionHandler(CCFile f) {
-			setFile(cc.get(f));
-		}
-
-		@Override
-		public void copyFile(File dest) throws Exception {
-			if (dest.exists() && !dest.delete())
-				throw new RuntimeException("Could not delete file: " + dest);
-			if (!newFile.renameTo(dest)) {
+		recurse(cc.getRoot(), f.getFile(), new Recurser() {
+			@Override
+			public void handleFile(String path) {
 				try {
-					IOUtils.copy(new FileInputStream(newFile),
-							new FileOutputStream(dest));
+					InputStream in = new FileInputStream(newFile);
+					imp.add(path, newFile.length(), in);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
 				} finally {
 					newFile.delete();
 				}
 			}
-		}
-
-		@Override
-		public void add(String file) throws Exception {
-			git.addForce(file);
-		}
+		});
 	}
 
-	private class RenameHandler extends FileHandler {
-
-		public RenameHandler(List<CCFile> all, CCFile f) {
-			setFile(handleRename(all, f));
-		}
-
-		private File handleRename(List<CCFile> all, CCFile f) {
-			for (CCFile file : all) {
-				if (file.getFile().equals(f.getFile())) {
-					return null;
-				}
-			}
-
+	private File getFile(CCFile f) {
+		if (!f.hasVersion()) {
 			// This is the lazy approach, but 9 times out of 10 it'll be fine.
 			// The probably is that the git history will have a slight anomaly.
 			// The important thing is that the working tree will be correct by
-			// the
-			// end of this rebase.
-			File newFile = cc.toFile(f.getFile());
-			return newFile.exists() ? newFile : null;
+			// the end of this rebase.
+			return cc.toFile(f.getFile());
 		}
+		return cc.get(f);
+	}
 
-		@Override
-		public void copyFile(File dest) throws Exception {
-			if (newFile.isDirectory()) {
-				// TODO Ignore for now
-				// How do we know if this was a rename, or a new addition?
-			} else {
-				IOUtils.copy(new FileInputStream(newFile),
-						new FileOutputStream(dest));
+	private void remove(CCFile f) {
+		recurse(git.getRoot(), f.getFile(), new Recurser() {
+			@Override
+			public void handleFile(String path) {
+				try {
+					imp.remove(path);
+				} catch (ExecException e) {
+					// Ignore
+				}
 			}
-		}
+		});
+	}
 
-		@Override
-		public void add(String file) throws Exception {
-			git.add(file);
+	private void recurse(File root, String path, Recurser r) {
+		File file = new File(root, path);
+		if (file.isDirectory()) {
+			for (String child : file.list()) {
+				recurse(root, path + '/' + child, r);
+			}
+		} else {
+			r.handleFile(path);
 		}
+	}
+
+	private interface Recurser {
+		void handleFile(String path);
 	}
 }
