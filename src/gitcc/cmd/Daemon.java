@@ -72,7 +72,6 @@ public class Daemon extends Command {
 		pull();
 		checkin();
 		rebase();
-		push();
 	}
 
 	private void checkin() throws Exception {
@@ -122,6 +121,7 @@ public class Daemon extends Command {
 					}
 					git.setConfig(SINCE, Long.toString(since));
 					git.gc();
+					push();
 				} finally {
 					git.checkoutForce(branch_cc);
 				}
