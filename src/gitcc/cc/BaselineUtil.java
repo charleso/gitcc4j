@@ -56,11 +56,9 @@ public class BaselineUtil extends BaseClearcase {
 		if (descs == null || descs.length == 0)
 			return;
 		for (IBaselineDescription desc : descs) {
-			if (desc.getIsComposite()) {
-				String bname = desc.getComponent().getName();
-				if (baselines.containsKey(bname)) {
-					baselines.put(bname, desc.getHandle());
-				}
+			String bname = desc.getComponent().getName();
+			if (baselines.containsKey(bname)) {
+				baselines.put(bname, desc.getHandle());
 			}
 		}
 		IBaselineHandle[] handles = baselines.values().toArray(
