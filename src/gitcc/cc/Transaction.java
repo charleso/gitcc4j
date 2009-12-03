@@ -122,11 +122,13 @@ public class Transaction extends Common {
 				break;
 			case Deleted:
 				cc.delete(s.getFile());
+				deleteEmptyDirs(s.getFile());
 				break;
 			case Renamed:
 				String oldFile = s.getOldFile();
 				String file = s.getFile();
 				cc.move(oldFile, file);
+				deleteEmptyDirs(oldFile);
 				checkouts.remove(oldFile);
 				checkouts.add(file);
 				write(s);
@@ -135,6 +137,15 @@ public class Transaction extends Common {
 				write(s);
 				break;
 			}
+		}
+	}
+
+	private void deleteEmptyDirs(String file) {
+		if (cc.toFile(file).getParentFile().list().length == 0) {
+			File parent = new File(file).getParentFile();
+			checkout(parent.getParentFile().getPath());
+			cc.delete(parent.getPath());
+			deleteEmptyDirs(parent.getPath());
 		}
 	}
 
