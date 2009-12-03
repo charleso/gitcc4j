@@ -33,6 +33,7 @@ public class Config {
 	private String[] recipients;
 
 	private long sleep = 5 * 60 * 1000;
+	private long rebaseTime = 5 * 60 * 1000;
 
 	private boolean deliver = true;
 
@@ -199,6 +200,14 @@ public class Config {
 
 	public long getSleep() {
 		return sleep;
+	}
+
+	public long getRebaseTime() {
+		return rebaseTime;
+	}
+
+	public void setRebaseTime(long rebaseTime) {
+		this.rebaseTime = rebaseTime;
 	}
 
 	public void addUser(User user) {

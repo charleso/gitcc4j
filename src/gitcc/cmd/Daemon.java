@@ -30,6 +30,7 @@ public class Daemon extends Command {
 	private static final String SINCE = "gitcc.since";
 
 	private EmailUtil email;
+	private long lastRebase;
 
 	@Override
 	public void init() {
@@ -71,7 +72,15 @@ public class Daemon extends Command {
 	protected void singlePass() throws Exception {
 		pull();
 		checkin();
-		rebase();
+		doRebase();
+	}
+
+	private void doRebase() throws Exception {
+		long time = new Date().getTime();
+		if (time - lastRebase > config.getRebaseTime()) {
+			rebase();
+			lastRebase = time;
+		}
 	}
 
 	private void checkin() throws Exception {
