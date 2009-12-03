@@ -32,7 +32,7 @@ public class Checkin extends Command {
 			count = checkin(c, count);
 			git.branchForce(config.getCI(), c.getId());
 		}
-		if (count > 0) {
+		if (count > 0 && config.isDeliver()) {
 			cc.deliver();
 			makeBaseline();
 		}

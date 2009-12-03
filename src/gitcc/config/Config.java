@@ -34,6 +34,8 @@ public class Config {
 
 	private long sleep = 5 * 60 * 1000;
 
+	private boolean deliver = true;
+
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
 	}
@@ -220,5 +222,13 @@ public class Config {
 
 	public void setRemote(String remote) {
 		this.remote = remote;
+	}
+
+	public void setDeliver(boolean deliver) {
+		this.deliver = deliver;
+	}
+
+	public boolean isDeliver() {
+		return deliver;
 	}
 }
