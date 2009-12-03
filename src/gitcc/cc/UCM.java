@@ -151,14 +151,17 @@ public class UCM extends ClearcaseImpl {
 
 		private int status;
 
+		@SuppressWarnings("unused")
 		public void runComplete(byte b, int i, boolean f) {
 			status = b;
 		}
 
+		@SuppressWarnings("unused")
 		public void statusNotify(int i, String s) {
 			Log.debug(s.trim());
 		}
 
+		@SuppressWarnings("unused")
 		public void configChangeNotify(String s) {
 			Log.debug(s.trim());
 		}
@@ -169,14 +172,6 @@ public class UCM extends ClearcaseImpl {
 
 		public boolean toBeCompleted() {
 			return status == 12;
-		}
-
-		public boolean isCompleted() {
-			return status == 19;
-		}
-
-		public boolean noWorkRequired() {
-			return status == 1;
 		}
 	};
 }
