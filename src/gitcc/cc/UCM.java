@@ -112,7 +112,7 @@ public class UCM extends ClearcaseImpl {
 					new CreateActivity.Listener() {
 						@Override
 						public void newActivity(IHeadlinedUcmActivity activity) {
-							activities.put(id[0] = activity.getId(), message);
+							activities.put(message, id[0] = activity.toSelector());
 						}
 					}));
 		} else {
