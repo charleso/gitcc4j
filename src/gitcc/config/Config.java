@@ -217,8 +217,11 @@ public class Config {
 
 	public User getUser(String author) {
 		User user = users.get(author);
+		author = author + "@" + suffix;
 		if (user == null)
-			user = getUserByEmail(author + "@" + suffix);
+			user = getUserByEmail(author);
+		if (user == null)
+			user = new User(author);
 		return user;
 	}
 
