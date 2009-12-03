@@ -96,6 +96,8 @@ public class ConfigParser {
 				value = Boolean.parseBoolean(svalue);
 			else if (Integer.TYPE.isAssignableFrom(type))
 				value = Integer.parseInt(svalue);
+			else if (Long.TYPE.isAssignableFrom(type))
+				value = Long.parseLong(svalue);
 			try {
 				m.invoke(config, value);
 			} catch (Exception e) {

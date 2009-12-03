@@ -193,6 +193,10 @@ public class Config {
 		this.sender = sender;
 	}
 
+	public void setSleep(long sleep) {
+		this.sleep = sleep;
+	}
+
 	public long getSleep() {
 		return sleep;
 	}

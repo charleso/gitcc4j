@@ -14,6 +14,7 @@ public class ConfigParserTest extends TestCase {
 				+ "branches = b|c            \n"
 				+ "url = http://test.com/    \n"
 				+ "debugLevel = 2            \n"
+				+ "sleep = 2                 \n"
 				+ "[master]                  \n"
 				+ "clearcase = a             \n"
 				+ "[test]                    \n"
@@ -25,6 +26,7 @@ public class ConfigParserTest extends TestCase {
 		assertEquals("a", config.getClearcase());
 		assertNull(config.getGroup());
 		assertEquals(2, config.getDebugLevel());
+		assertEquals(2, config.getSleep());
 	}
 
 	public void testProcessName() {
