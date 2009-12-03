@@ -74,6 +74,7 @@ public class UCM extends ClearcaseImpl {
 
 	@Override
 	public void rebase() {
+		debug("rebase");
 		run(new PrepareRebase(session, copyArea,
 				log(PrepareRebase.Listener.class)));
 		UI ui = _rebase(RebaseStream.OperationType.REBASE_START);
@@ -106,6 +107,7 @@ public class UCM extends ClearcaseImpl {
 		}
 		final String[] id = new String[] { activities.get(message) };
 		if (id[0] == null) {
+			debug("mkact -headline \"" + message + "\"");
 			run(new CreateActivity(session, copyArea, message, null, null,
 					new CreateActivity.Listener() {
 						@Override
@@ -114,6 +116,7 @@ public class UCM extends ClearcaseImpl {
 						}
 					}));
 		} else {
+			debug("setact " + id[0]);
 			run(new SetCurrentActivity(session, id[0], copyArea,
 					log(SetCurrentActivity.Listener.class)));
 		}

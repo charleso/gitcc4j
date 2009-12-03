@@ -302,7 +302,7 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 		return cc;
 	}
 
-	private void debug(String s) {
+	protected void debug(String s) {
 		Log.debug("cleartool " + s);
 	}
 
