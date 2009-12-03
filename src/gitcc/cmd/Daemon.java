@@ -5,7 +5,6 @@ import gitcc.config.Config;
 import gitcc.config.User;
 import gitcc.git.GitCommit;
 import gitcc.git.GitUtil;
-import gitcc.util.CheckinException;
 import gitcc.util.EmailUtil;
 
 import java.util.Date;
@@ -84,32 +83,27 @@ public class Daemon extends Command {
 	}
 
 	private void checkin() throws Exception {
-		try {
-			exec(new Checkin() {
-				@Override
-				protected void checkin(List<GitCommit> log) throws Exception {
-					// Only checkin one at a time so we can change users
-					for (List<GitCommit> l : GitUtil.splitLogByUser(log)) {
-						GitCommit c = l.get(0);
-						User user = config.getUserByEmail(c.getAuthor());
-						if (user == null)
-							throw new RuntimeException("User not found: "
-									+ c.getAuthor());
-						cc = cc.cloneForUser(user);
-						super.checkin(l);
-					}
+		exec(new Checkin() {
+			@Override
+			protected void checkin(List<GitCommit> log) throws Exception {
+				// Only checkin one at a time so we can change users
+				for (List<GitCommit> l : GitUtil.splitLogByUser(log)) {
+					GitCommit c = l.get(0);
+					User user = config.getUserByEmail(c.getAuthor());
+					if (user == null)
+						throw new RuntimeException("User not found: "
+								+ c.getAuthor());
+					cc = cc.cloneForUser(user);
+					super.checkin(l);
 				}
+			}
 
-				@Override
-				protected void makeBaseline() {
-					// TODO Permission problems
-					Daemon.this.cc.makeBaseline();
-				}
-			});
-		} catch (CheckinException e) {
-			// Basically ignore this - we don't care
-			Log.debug(e.getMessage());
-		}
+			@Override
+			protected void makeBaseline() {
+				// TODO Permission problems
+				Daemon.this.cc.makeBaseline();
+			}
+		});
 	}
 
 	private void rebase() throws Exception {
