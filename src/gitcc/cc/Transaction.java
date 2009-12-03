@@ -35,7 +35,11 @@ public class Transaction extends Common {
 			phase1();
 			mkdirs();
 		} catch (RuntimeException e) {
-			rollback();
+			try {
+				rollback();
+			} catch(RuntimeException ex) {
+				ex.printStackTrace();
+			}
 			throw e;
 		}
 		phase2();
@@ -93,10 +97,20 @@ public class Transaction extends Common {
 	}
 
 	private void rollback() {
-		for (String f : checkouts) {
+		for (String f : reverseCheckouts()) {
 			cc.uncheckout(f);
 		}
 		cc.rmact(activity);
+	}
+
+	/**
+	 * Need to reverse, otherwise we will have problems with newly added folders
+	 * + files.
+	 */
+	private Iterable<String> reverseCheckouts() {
+		List<String> reverse = new ArrayList<String>(checkouts);
+		Collections.reverse(reverse);
+		return reverse;
 	}
 
 	private void phase2() {
