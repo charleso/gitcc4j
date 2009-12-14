@@ -38,8 +38,9 @@ public class GitUtil {
 			String old = file;
 			Status s = null;
 			switch (type.charAt(0)) {
-			case 'A':
 			case 'C':
+				file = split[++i];
+			case 'A':
 				s = Status.Added;
 				break;
 			case 'D':

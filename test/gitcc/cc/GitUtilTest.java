@@ -32,7 +32,8 @@ public class GitUtilTest extends TestCase {
 	}
 
 	public void testParseDiff() {
-		List<FileStatus> s = util.parseDiff("A\0a\0D\0d\0M\0m\0R\0r1\0r2");
+		List<FileStatus> s = util
+				.parseDiff("A\0a\0D\0d\0M\0m\0R\0r1\0r2\0C\0c1\0c2");
 		StringBuilder b = new StringBuilder();
 		for (FileStatus fs : s) {
 			b.append(fs.getStatus().toString().charAt(0));
@@ -41,7 +42,7 @@ public class GitUtilTest extends TestCase {
 			b.append("|");
 			b.append(fs.getFile());
 		}
-		assertEquals("A|a|aD|d|dM|m|mR|r1|r2", b.toString());
+		assertEquals("A|a|aD|d|dM|m|mR|r1|r2A|c1|c2", b.toString());
 	}
 
 	public void testParseDate() {
