@@ -19,7 +19,7 @@ public class GitImpl extends Exec implements Git {
 	private final GitUtil util = new GitUtil();
 
 	public GitImpl(File root) {
-		super("git", "--no-pager");
+		setCmd("git", "--no-pager");
 		setRoot(root);
 	}
 

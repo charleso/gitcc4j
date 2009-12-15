@@ -1,5 +1,6 @@
 package gitcc.cc;
 
+import gitcc.config.Config;
 import gitcc.config.User;
 
 import java.io.File;
@@ -7,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface Clearcase {
+
+	void setConfig(Config config) throws Exception;
 
 	void update();
 
@@ -39,8 +42,6 @@ public interface Clearcase {
 	File get(CCFile f);
 
 	boolean exists(String path);
-
-	void write(String file, byte[] bytes);
 
 	File toFile(String file);
 

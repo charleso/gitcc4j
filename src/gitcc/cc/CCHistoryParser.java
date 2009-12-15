@@ -5,15 +5,22 @@ import gitcc.cc.CCFile.Status;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class CCHistoryParser {
+
+	private static final String SINCE_DATE_FORMAT = "dd-MMM-yyyy.HH:mm:ss";
+	private static final String LSH_FORMAT = "%o%m|%Nd|%u|%En|%Vn|";
 
 	private static final String FILE = "checkinversion";
 	private static final String DIR = "checkindirectory version";
@@ -97,4 +104,27 @@ public class CCHistoryParser {
 			return i != 0 ? i : -1;
 		}
 	}
+
+	public List<String> getArgs(Date since, boolean ucm) {
+		String format = LSH_FORMAT + getCommentFormat(ucm) + SEP;
+		List<String> args = new ArrayList<String>();
+		args.add("-r");
+		args.add("-fmt");
+		args.add(format);
+		if (since != null) {
+			Calendar c = Calendar.getInstance();
+			c.setTime(since);
+			c.add(Calendar.SECOND, 1);
+			since = c.getTime();
+			args.add("-since");
+			args.add(new SimpleDateFormat(CCHistoryParser.SINCE_DATE_FORMAT)
+					.format(since));
+		}
+		return args;
+	}
+
+	private String getCommentFormat(boolean ucm) {
+		return !ucm ? "%Nc" : "%[activity]Xp";
+	}
+
 }

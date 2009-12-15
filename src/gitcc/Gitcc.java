@@ -1,8 +1,7 @@
 package gitcc;
 
 import gitcc.cc.Clearcase;
-import gitcc.cc.ClearcaseImpl;
-import gitcc.cc.UCM;
+import gitcc.cc.exec.ClearcaseExec;
 import gitcc.cmd.Checkin;
 import gitcc.cmd.Command;
 import gitcc.cmd.Daemon;
@@ -46,6 +45,7 @@ public class Gitcc {
 		parser.loadUsers(config, new File(git.getRoot(), ".git/users"));
 
 		command.cc = createClearcase(command.config);
+		command.cc.setConfig(command.config);
 		try {
 			command.execute();
 			System.exit(0);
@@ -72,12 +72,22 @@ public class Gitcc {
 		return dir;
 	}
 
-	private static Clearcase createClearcase(Config config) throws Exception {
-		if (config.isUCM()) {
-			return new UCM(config);
-		} else {
-			return new ClearcaseImpl(config);
+	public static Clearcase createClearcase(Config config) throws Exception {
+		boolean exec = ClearcaseExec.isAvailable(config);
+		if (exec) {
+			if (config.isUCM()) {
+				return loadCC("exec.UCMExec");
+			}
+			return loadCC("exec.ClearcaseExec");
 		}
+		if (config.isUCM()) {
+			return loadCC("UCM");
+		}
+		return loadCC("ClearcaseImpl");
+	}
+
+	private static Clearcase loadCC(String type) throws Exception {
+		return (Clearcase) Class.forName("gitcc.cc." + type).newInstance();
 	}
 
 	private static Command getCommand(String type) throws Exception {

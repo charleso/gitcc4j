@@ -27,6 +27,7 @@ public class Config {
 	private String integration;
 	private String stream;
 	private String remote;
+	private String cleartool = "cleartool";
 
 	private String smtp;
 	private String sender;
@@ -180,7 +181,7 @@ public class Config {
 	public List<String> getAllEmails() {
 		List<String> emails = new ArrayList<String>();
 		emails.addAll(Arrays.asList(recipients));
-		for(User user : users.values()) {
+		for (User user : users.values()) {
 			emails.add(user.getEmail());
 		}
 		return emails;
@@ -246,5 +247,13 @@ public class Config {
 
 	public boolean isDeliver() {
 		return deliver;
+	}
+
+	public String getCleartool() {
+		return cleartool;
+	}
+
+	public void setCleartool(String cleartool) {
+		this.cleartool = cleartool;
 	}
 }

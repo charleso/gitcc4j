@@ -5,12 +5,8 @@ import gitcc.config.Config;
 import gitcc.config.User;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -38,9 +34,8 @@ import com.ibm.rational.clearcase.remote_core.util.Status;
 
 public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 
-	private static final String LSH_FORMAT = "%o%m|%Nd|%u|%En|%Vn|";
 	protected static final HijackTreatment HIJACK_TREATMENT = HijackTreatment.OVERWRITE;
-	private static final String DATE_FORMAT = "dd-MMM-yyyy.HH:mm:ss";
+	private static final CCHistoryParser histParser = new CCHistoryParser();
 	private static final String RPC_PATH = "/TeamCcrc/ccrc/";
 
 	protected Config config;
@@ -51,19 +46,12 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	private CopyAreaFile[] files;
 	private String extraPath;
 
-	public ClearcaseImpl(Config config) {
+	@Override
+	public void setConfig(Config config) throws Exception {
 		this.config = config;
-		try {
-			String url = new URL(new URL(config.getUrl()), RPC_PATH).toString();
-			session = new Session(url, new Credentials(config));
-			setRoot(config.getClearcase());
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected ClearcaseImpl() {
-		super();
+		String url = new URL(new URL(config.getUrl()), RPC_PATH).toString();
+		session = new Session(url, new Credentials(config));
+		setRoot(config.getClearcase());
 	}
 
 	private void setRoot(String configPath) throws Exception {
@@ -121,17 +109,6 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 		debug("unco " + file);
 		run(new Uncheckout(session, log(IVectoredFileCmdListener.class), false,
 				singleFile(file)));
-	}
-
-	@Override
-	public void write(String file, byte[] bytes) {
-		try {
-			FileOutputStream writer = new FileOutputStream(copyFile(file));
-			writer.write(bytes);
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Override
@@ -197,19 +174,7 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	@Override
 	public String getHistory(Date since) {
 		cd();
-		String format = LSH_FORMAT + getCommentFormat() + CCHistoryParser.SEP;
-		List<String> args = new ArrayList<String>();
-		args.add("-r");
-		args.add("-fmt");
-		args.add(format);
-		if (since != null) {
-			Calendar c = Calendar.getInstance();
-			c.setTime(since);
-			c.add(Calendar.SECOND, 1);
-			since = c.getTime();
-			args.add("-since");
-			args.add(new SimpleDateFormat(DATE_FORMAT).format(since));
-		}
+		List<String> args = histParser.getArgs(since, this instanceof UCM);
 		for (CopyAreaFile include : files) {
 			args.add(include.getCopyAreaRelPname());
 		}

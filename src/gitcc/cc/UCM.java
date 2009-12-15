@@ -28,8 +28,9 @@ public class UCM extends ClearcaseImpl {
 
 	private CopyArea integeration;
 
-	public UCM(Config config) throws Exception {
-		super(config);
+	@Override
+	public void setConfig(Config config) throws Exception {
+		super.setConfig(config);
 		init(config);
 	}
 
@@ -42,15 +43,6 @@ public class UCM extends ClearcaseImpl {
 
 	private void init(Config config) throws IOException {
 		integeration = CopyArea.open(config.getIntegration());
-	}
-
-	protected UCM() {
-		super();
-	}
-
-	@Override
-	protected String getCommentFormat() {
-		return "%[activity]Xp";
 	}
 
 	@Override

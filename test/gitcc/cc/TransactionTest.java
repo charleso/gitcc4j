@@ -8,6 +8,7 @@ import gitcc.git.FileStatus.Status;
 import gitcc.util.CheckinException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -93,8 +94,14 @@ public class TransactionTest extends TestCase {
 	}
 
 	private void write(String a) {
-		EasyMock.expect(git.catFile("sha", a)).andReturn(null);
-		cc.write(a, null);
+		EasyMock.expect(git.catFile("sha", a)).andReturn(new byte[0]);
+		try {
+			File f = File.createTempFile("transaction" + a, ".tmp");
+			f.deleteOnExit();
+			EasyMock.expect(cc.toFile(a)).andReturn(f);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private FileStatus f(String file, Status status) {

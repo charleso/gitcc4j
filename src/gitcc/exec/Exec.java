@@ -10,10 +10,10 @@ import java.io.InputStream;
 
 public class Exec {
 
-	private final String[] cmd;
+	private String[] cmd;
 	private File root;
 
-	public Exec(String... cmd) {
+	public void setCmd(String... cmd) {
 		this.cmd = cmd;
 	}
 
@@ -25,6 +25,11 @@ public class Exec {
 		return _exec(null, args);
 	}
 
+	protected Process startProcess(String[] env, String... args)
+			throws IOException {
+		return Runtime.getRuntime().exec(args, env, root);
+	}
+
 	public byte[] _exec(String[] env, String... args) {
 		String[] _args = new String[args.length + cmd.length];
 		System.arraycopy(args, 0, _args, cmd.length, args.length);
@@ -33,7 +38,7 @@ public class Exec {
 		}
 		debug(_args);
 		try {
-			Process process = Runtime.getRuntime().exec(_args, env, root);
+			Process process = startProcess(env, _args);
 			byte[] stdout = getBytes(process.getInputStream());
 			String error = new String(getBytes(process.getErrorStream()));
 			if (process.waitFor() > 0) {

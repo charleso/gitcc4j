@@ -6,6 +6,7 @@ import gitcc.git.GitCommit;
 import gitcc.util.CheckinException;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -172,6 +173,14 @@ public class Transaction extends Common {
 	}
 
 	private void write(FileStatus s) {
-		cc.write(s.getFile(), git.catFile(id, s.getFile()));
+		byte[] bytes = git.catFile(id, s.getFile());
+		File file = cc.toFile(s.getFile());
+		try {
+			FileOutputStream writer = new FileOutputStream(file);
+			writer.write(bytes);
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
