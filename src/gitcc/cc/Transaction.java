@@ -34,15 +34,15 @@ public class Transaction extends Common {
 		try {
 			phase1();
 			mkdirs();
+			phase2();
 		} catch (RuntimeException e) {
 			try {
 				rollback();
-			} catch(RuntimeException ex) {
+			} catch (RuntimeException ex) {
 				ex.printStackTrace();
 			}
 			throw e;
 		}
-		phase2();
 		commit();
 	}
 
@@ -82,7 +82,18 @@ public class Transaction extends Common {
 	private boolean checkout(String oldFile) {
 		if (checkouts.contains(oldFile))
 			return false;
-		cc.checkout(oldFile);
+		try {
+			cc.checkout(oldFile);
+		} catch (RuntimeException e) {
+			String message = e.getMessage();
+			if (message.contains("Version discordance detected")
+					|| message.contains("is already checked out")) {
+				cc.uncheckout(oldFile);
+				cc.checkout(oldFile);
+			} else {
+				throw e;
+			}
+		}
 		checkouts.add(oldFile);
 		return true;
 	}
@@ -141,7 +152,8 @@ public class Transaction extends Common {
 	}
 
 	private void deleteEmptyDirs(String file) {
-		if (cc.toFile(file).getParentFile().list().length == 0) {
+		String[] l = cc.toFile(file).getParentFile().list();
+		if (l.length == 0 || (l.length == 1 && ".copyarea.db".equals(l[0]))) {
 			File parent = new File(file).getParentFile();
 			checkout(parent.getParentFile().getPath());
 			cc.delete(parent.getPath());

@@ -161,12 +161,20 @@ public class Rebase extends Command {
 
 		@Override
 		public void copyFile(File dest) throws Exception {
-			if (newFile.isDirectory()) {
-				// TODO Ignore for now
-				// How do we know if this was a rename, or a new addition?
+			recurse(newFile, dest);
+		}
+
+		private void recurse(File src, File dest) throws Exception {
+			if (src.isDirectory()) {
+				dest.mkdir();
+				for (File file : src.listFiles()) {
+					if (file.getName().equals(".copyarea.db"))
+						continue;
+					recurse(file, new File(dest, file.getName()));
+				}
 			} else {
-				IOUtils.copy(new FileInputStream(newFile),
-						new FileOutputStream(dest));
+				IOUtils.copy(new FileInputStream(src), new FileOutputStream(
+						dest));
 			}
 		}
 

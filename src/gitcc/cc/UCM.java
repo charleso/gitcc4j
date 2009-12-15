@@ -16,6 +16,7 @@ import com.ibm.rational.clearcase.remote_core.cmds.properties.GetActivityPropert
 import com.ibm.rational.clearcase.remote_core.cmds.sync.SyncViewFromStream;
 import com.ibm.rational.clearcase.remote_core.copyarea.CopyArea;
 import com.ibm.rational.clearcase.remote_core.integration.DeliverStream;
+import com.ibm.rational.clearcase.remote_core.integration.PrepareDeliver;
 import com.ibm.rational.clearcase.remote_core.integration.PrepareRebase;
 import com.ibm.rational.clearcase.remote_core.integration.RebaseStream;
 import com.ibm.rational.clearcase.remote_core.server_entities.description.ICommonActivity;
@@ -69,6 +70,7 @@ public class UCM extends ClearcaseImpl {
 
 	@Override
 	public void update() {
+		sync();
 		rebase();
 	}
 
@@ -128,18 +130,51 @@ public class UCM extends ClearcaseImpl {
 		// TODO Remove activity
 	}
 
+	@Override
 	public void deliver() {
+		for (int i = 3; i >= 0; i--) {
+			try {
+				_deliver();
+				return;
+			} catch (RuntimeException e) {
+				if (i == 0)
+					throw e;
+				e.printStackTrace();
+				rebase();
+			}
+		}
+	}
+
+	private void sync() {
 		run(new SyncViewFromStream(session, new UpdateListener(), integeration,
 				HIJACK_TREATMENT));
+	}
+
+	private void _deliver() {
+		sync();
+		run(new PrepareDeliver(session, integeration,
+				log(PrepareDeliver.Listener.class)));
 		if (!_deliver(DeliverStream.OperationType.DELIVER_START)
-				.toBeCompleted())
-			throw new ExecException("An error occured on deliver");
+				.toBeCompleted()) {
+			if (!_deliver(DeliverStream.OperationType.DELIVER_RESUME)
+					.toBeCompleted())
+				throw new ExecException("An error occured on deliver");
+		}
 		_deliver(DeliverStream.OperationType.DELIVER_COMPLETE);
 	}
 
 	@Override
 	public void makeBaseline() {
-		new BaselineUtil(session, config.getStream()).run();
+		for (int i = 3; i >= 0; i--) {
+			try {
+				new BaselineUtil(session, config.getStream()).run();
+				return;
+			} catch (RuntimeException e) {
+				if (i == 0)
+					throw e;
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private UI _deliver(DeliverStream.OperationType type) {

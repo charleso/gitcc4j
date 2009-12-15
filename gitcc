@@ -1,6 +1,7 @@
 #/bin/bash
 ROOT=`dirname $0`
 CP=$ROOT/bin
+CP=$CP:$ROOT/lib/mail.jar
 CP=$CP:$CC_TEAM_API/remote_core.jar
 CP=$CP:$CC_TEAM_API/stpwvcm.jar
 CP=$CP:$CC_TEAM_API/commons-httpclient-3.0.jar

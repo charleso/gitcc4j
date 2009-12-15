@@ -36,7 +36,7 @@ public class Daemon extends Command {
 		email = new EmailUtil(config);
 		git.checkout(Config.DEFAULT_MASTER);
 		git.setConfig("receive.denyCurrentBranch", "true");
-		git.setConfig("receive.denyNonFastForwards", "true");
+		// git.setConfig("receive.denyNonFastForwards", "true");
 	}
 
 	@Override
