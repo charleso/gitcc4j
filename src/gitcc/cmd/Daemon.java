@@ -42,17 +42,12 @@ public class Daemon extends Command {
 	@Override
 	public void execute() throws Exception {
 		while (true) {
-			if (sanityCheck(config.getCC(), config.getBranch())) {
-				try {
-					singlePass();
-				} catch (Exception e) {
-					e.printStackTrace();
-					email.send(e);
-					System.exit(1);
-				}
-			} else {
-				String error = "Repository is in a bad state. Wake me up when you fix it.";
-				Log.info(error);
+			try {
+				singlePass();
+			} catch (Exception e) {
+				e.printStackTrace();
+				email.send(e);
+				System.exit(1);
 			}
 			Log.info("Sleeping...");
 			Thread.sleep(config.getSleep());
@@ -69,6 +64,10 @@ public class Daemon extends Command {
 	}
 
 	protected void singlePass() throws Exception {
+		if (!sanityCheck(config.getCC(), config.getBranch())) {
+			String error = "Repository is in a bad state. Wake me up when you fix it.";
+			throw new RuntimeException(error);
+		}
 		pull();
 		checkin();
 		doRebase();
