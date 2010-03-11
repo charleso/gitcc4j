@@ -222,7 +222,7 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	private void cd() {
 		for (String line : cleartool("lsview").split("\n")) {
 			String[] s = line.trim().split(" ");
-			if (root.getRoot().contains(s[0])) {
+			if (root.getRoot().endsWith(s[0])) {
 				String path = s[s.length - 1];
 				path = path.substring(path.indexOf('/'));
 				path = path.replaceAll(".view.stg", "");
