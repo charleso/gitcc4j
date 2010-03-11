@@ -64,11 +64,11 @@ public class Daemon extends Command {
 	}
 
 	protected void singlePass() throws Exception {
+		pull();
 		if (!sanityCheck(config.getCC(), config.getBranch())) {
 			String error = "Repository is in a bad state. Wake me up when you fix it.";
 			throw new RuntimeException(error);
 		}
-		pull();
 		checkin();
 		doRebase();
 	}
