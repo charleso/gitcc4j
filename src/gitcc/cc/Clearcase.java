@@ -3,7 +3,6 @@ package gitcc.cc;
 import gitcc.config.User;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public interface Clearcase {
 
 	void mkdir(String dir);
 
-	Collection<CCCommit> getHistory(Date since);
+	String getHistory(Date since);
 
 	List<CCFile> diffPred(CCFile file);
 
@@ -48,4 +47,8 @@ public interface Clearcase {
 	Clearcase cloneForUser(User user) throws Exception;
 
 	void makeBaseline();
+
+	String getRealComment(String comment);
+
+	void fixFile(CCFile f);
 }

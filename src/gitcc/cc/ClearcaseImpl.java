@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +40,6 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 
 	private static final String LSH_FORMAT = "%o%m|%Nd|%u|%En|%Vn|";
 	protected static final HijackTreatment HIJACK_TREATMENT = HijackTreatment.OVERWRITE;
-	private static final CCHistoryParser histParser = new CCHistoryParser();
 	private static final String DATE_FORMAT = "dd-MMM-yyyy.HH:mm:ss";
 	private static final String RPC_PATH = "/TeamCcrc/ccrc/";
 
@@ -192,7 +190,7 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	}
 
 	@Override
-	public Collection<CCCommit> getHistory(Date since) {
+	public String getHistory(Date since) {
 		cd();
 		String format = LSH_FORMAT + getCommentFormat() + CCHistoryParser.SEP;
 		List<String> args = new ArrayList<String>();
@@ -211,16 +209,12 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 			args.add(include.getCopyAreaRelPname());
 		}
 		String[] _args = (String[]) args.toArray(new String[args.size()]);
-		String lsh = cleartool("lshistory", _args);
-		Collection<CCCommit> commits = histParser.parse(lsh, config
-				.getBranches());
-		for (CCCommit commit : commits) {
-			for (CCFile f : commit.getFiles()) {
-				f.setFile(f.getFile().substring(extraPath.length()));
-			}
-			commit.setMessage(getRealComment(commit.getMessage()));
-		}
-		return commits;
+		return cleartool("lshistory", _args);
+	}
+
+	@Override
+	public void fixFile(CCFile f) {
+		f.setFile(f.getFile().substring(extraPath.length()));
 	}
 
 	// TODO This is just wrong. We need to find another
@@ -243,7 +237,8 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 		return "%Nc";
 	}
 
-	protected String getRealComment(String comment) {
+	@Override
+	public String getRealComment(String comment) {
 		return comment;
 	}
 

@@ -6,6 +6,7 @@ import gitcc.cc.UCM;
 import gitcc.cmd.Checkin;
 import gitcc.cmd.Command;
 import gitcc.cmd.Daemon;
+import gitcc.cmd.Import;
 import gitcc.cmd.Rebase;
 import gitcc.cmd.Reset;
 import gitcc.cmd.Update;
@@ -22,7 +23,7 @@ import java.util.Arrays;
 public class Gitcc {
 
 	private static Class<Command>[] commands = new Class[] { Checkin.class,
-			Rebase.class, Reset.class, Daemon.class, Update.class };
+			Rebase.class, Reset.class, Daemon.class, Update.class, Import.class };
 
 	public static void main(String[] args) throws Exception {
 		ProxyHelper.initProxy();

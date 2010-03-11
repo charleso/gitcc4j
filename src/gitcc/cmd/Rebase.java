@@ -2,6 +2,7 @@ package gitcc.cmd;
 
 import gitcc.cc.CCCommit;
 import gitcc.cc.CCFile;
+import gitcc.cc.CCHistoryParser;
 import gitcc.cc.CCFile.Status;
 import gitcc.util.ExecException;
 import gitcc.util.IOUtils;
@@ -9,11 +10,16 @@ import gitcc.util.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 public class Rebase extends Command {
+
+	protected static final String BACKUP = ".git/lshistory.bak";
+	private static final CCHistoryParser histParser = new CCHistoryParser();
 
 	@Override
 	public void execute() throws Exception {
@@ -21,7 +27,7 @@ public class Rebase extends Command {
 		String branch = config.getBranch();
 		boolean normal = branch != null;
 		Date since = normal ? getSince() : null;
-		Collection<CCCommit> commits = cc.getHistory(since);
+		Collection<CCCommit> commits = getHistory(since);
 		if (commits.isEmpty())
 			return;
 		// TODO Git fast import
@@ -37,6 +43,34 @@ public class Rebase extends Command {
 			git.branch(config.getCC());
 		}
 		git.branchForce(config.getCI(), config.getCC());
+	}
+
+	protected Collection<CCCommit> getHistory(Date since) {
+		String lsh = cc.getHistory(since);
+		backupHistory(lsh);
+		return parseHistory(lsh);
+	}
+
+	protected Collection<CCCommit> parseHistory(String lsh) {
+		Collection<CCCommit> commits = histParser.parse(lsh, config
+				.getBranches());
+		for (CCCommit commit : commits) {
+			for (CCFile f : commit.getFiles()) {
+				cc.fixFile(f);
+			}
+			commit.setMessage(cc.getRealComment(commit.getMessage()));
+		}
+		return commits;
+	}
+
+	private void backupHistory(String lsh) {
+		try {
+			FileWriter writer = new FileWriter(BACKUP);
+			writer.append(lsh);
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected Date getSince() {
