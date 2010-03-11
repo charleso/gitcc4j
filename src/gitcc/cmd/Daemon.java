@@ -120,10 +120,10 @@ public class Daemon extends Command {
 					if (sanityCheck(branch, branch_cc)) {
 						git.checkout(branch);
 						git.merge(branch_cc);
+						push();
 					}
 					git.setConfig(SINCE, Long.toString(since));
 					git.gc();
-					push();
 				} finally {
 					git.checkoutForce(branch_cc);
 				}
