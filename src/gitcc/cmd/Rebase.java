@@ -167,7 +167,7 @@ public class Rebase extends Command {
 
 		@Override
 		public void add(String file) throws Exception {
-			git.addForce(file);
+			git.add(file);
 		}
 	}
 

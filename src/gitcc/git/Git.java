@@ -13,8 +13,6 @@ public interface Git {
 
 	void add(String file);
 
-	void addForce(String file);
-
 	void remove(String file);
 
 	void commit(CCCommit commit, User user);

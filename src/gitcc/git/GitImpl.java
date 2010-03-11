@@ -28,11 +28,6 @@ public class GitImpl extends Exec implements Git {
 	}
 
 	@Override
-	public void addForce(String file) {
-		exec("add", "-f", "--", file);
-	}
-
-	@Override
 	public void remove(String file) {
 		exec("rm", "-r", "--", file);
 	}
