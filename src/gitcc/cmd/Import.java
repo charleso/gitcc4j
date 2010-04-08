@@ -16,7 +16,7 @@ public class Import extends Rebase {
 		Collection<CCCommit> history = parseHistory(lsh);
 		for (Iterator<CCCommit> i = history.iterator(); i.hasNext();) {
 			CCCommit commit = i.next();
-			if (commit.getDate().before(since)) {
+			if (since != null && commit.getDate().before(since)) {
 				i.remove();
 				System.out.println("Skipping: " + commit.getMessage());
 			}
