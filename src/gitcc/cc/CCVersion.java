@@ -1,5 +1,7 @@
 package gitcc.cc;
 
+import java.util.Arrays;
+
 public class CCVersion {
 
 	private final String version;
@@ -9,8 +11,13 @@ public class CCVersion {
 	}
 
 	public String getBranch() {
-		String[] s = version.split("/");
-		return s[s.length - 2];
+		String[] branches = getBranches();
+		return branches[branches.length - 1];
+	}
+
+	public String[] getBranches() {
+		String[] branches = version.split("/");
+		return Arrays.copyOfRange(branches, 1, branches.length - 1);
 	}
 
 	public String getFullVersion() {
