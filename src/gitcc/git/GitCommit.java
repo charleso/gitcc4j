@@ -31,6 +31,7 @@ public class GitCommit {
 	}
 
 	public static String getSubject(String message) {
-		return message.split("\n")[0];
+		String[] split = message.split("\n");
+		return split.length > 0 ? split[0] : "";
 	}
 }
