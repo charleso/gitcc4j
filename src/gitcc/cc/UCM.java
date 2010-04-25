@@ -134,17 +134,7 @@ public class UCM extends ClearcaseImpl {
 
 	@Override
 	public void deliver() {
-		for (int i = 3; i >= 0; i--) {
-			try {
-				_deliver();
-				return;
-			} catch (RuntimeException e) {
-				if (i == 0)
-					throw e;
-				e.printStackTrace();
-				rebase();
-			}
-		}
+		_deliver();
 	}
 
 	private void sync() {
@@ -167,16 +157,7 @@ public class UCM extends ClearcaseImpl {
 
 	@Override
 	public void makeBaseline() {
-		for (int i = 3; i >= 0; i--) {
-			try {
-				new BaselineUtil(session, config.getStream()).run();
-				return;
-			} catch (RuntimeException e) {
-				if (i == 0)
-					throw e;
-				e.printStackTrace();
-			}
-		}
+		new BaselineUtil(session, config.getStream()).run();
 	}
 
 	private UI _deliver(DeliverStream.OperationType type) {
