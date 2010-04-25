@@ -214,7 +214,9 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 
 	@Override
 	public void fixFile(CCFile f) {
-		f.setFile(f.getFile().substring(extraPath.length()));
+		if (f.getFile().startsWith(extraPath)) {
+			f.setFile(f.getFile().substring(extraPath.length()));
+		}
 	}
 
 	// TODO This is just wrong. We need to find another
