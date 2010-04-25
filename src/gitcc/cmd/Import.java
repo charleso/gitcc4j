@@ -10,6 +10,8 @@ import java.util.Iterator;
 
 public class Import extends Rebase {
 
+	public String backup = BACKUP;
+
 	@Override
 	protected Collection<CCCommit> getHistory(Date since) {
 		String lsh = loadHistory();
@@ -33,7 +35,7 @@ public class Import extends Rebase {
 	}
 
 	private String _loadHistory() throws Exception {
-		BufferedReader reader = new BufferedReader(new FileReader(BACKUP));
+		BufferedReader reader = new BufferedReader(new FileReader(backup));
 		StringBuilder b = new StringBuilder();
 		for (String line; (line = reader.readLine()) != null;) {
 			b.append(line).append("\n");
