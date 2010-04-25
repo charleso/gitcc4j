@@ -20,7 +20,6 @@ public class CCHistoryParser {
 	public static final String SEP = "@@@";
 	private static final String DATE_FORMAT = "yyyyMMdd.HHmmss";
 	private static final String SEP2 = "\\|";
-	private static final String EMPTY = "<empty message>";
 
 	// TODO We can/should have better heuristics here
 	// ie Check a few commits back just in case...
@@ -63,7 +62,7 @@ public class CCHistoryParser {
 		commit.setAuthor(split[2]);
 		CCFile file = new CCFile(split[3], split[4], getType(split[0]));
 		commit.getFiles().add(file);
-		commit.setMessage(split.length > 5 ? split[5] : EMPTY);
+		commit.setMessage(split.length > 5 ? split[5] : "");
 		return commit;
 	}
 

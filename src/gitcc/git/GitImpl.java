@@ -14,6 +14,7 @@ public class GitImpl extends Exec implements Git {
 
 	private static final String ISO_DATE = "yyyy-MM-dd'T'HH:mm:ss";
 	private static final String LOG_FORMAT = "%H%x01%ae%x01%s%n%b";
+	private static final String EMPTY = "<empty message>";
 
 	private final GitUtil util = new GitUtil();
 
@@ -43,7 +44,9 @@ public class GitImpl extends Exec implements Git {
 				"GIT_COMMITTER_NAME=" + name, "GIT_AUTHOR_EMAIL=" + email,
 				"GIT_COMMITTER_EMAIL=" + email, };
 		try {
-			exec(env, "commit", "-m", commit.getMessage());
+			String message = commit.getMessage();
+			message = !message.isEmpty() ? message : EMPTY;
+			exec(env, "commit", "-m", message);
 		} catch (ExecException e) {
 			if (e.getMessage().contains("nothing to commit"))
 				return;
