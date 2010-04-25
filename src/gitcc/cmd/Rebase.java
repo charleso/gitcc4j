@@ -58,7 +58,9 @@ public class Rebase extends Command {
 			for (CCFile f : commit.getFiles()) {
 				cc.fixFile(f);
 			}
-			commit.setMessage(cc.getRealComment(commit.getMessage()));
+			if (!commit.getMessage().isEmpty()) {
+				commit.setMessage(cc.getRealComment(commit.getMessage()));
+			}
 		}
 		return commits;
 	}
