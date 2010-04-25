@@ -320,7 +320,7 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 
 		@Override
 		public void endContributor(String path, MaterializedVersion version) {
-			int i = files[0] == null ? 0 : 1;
+			int i = files[0] == null || files.length == 1 ? 0 : 1;
 			files[i] = (CopyAreaFile) version.getFile();
 		}
 
