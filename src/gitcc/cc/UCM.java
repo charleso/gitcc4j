@@ -55,6 +55,8 @@ public class UCM extends ClearcaseImpl {
 
 	@Override
 	public String getRealComment(String activity) {
+		if (!activity.startsWith("activity:"))
+			return activity;
 		final String[] info = new String[1];
 		run(new GetActivityProperties(session, copyArea, activity, log(
 				GetActivityProperties.Listener.class, new Object() {
