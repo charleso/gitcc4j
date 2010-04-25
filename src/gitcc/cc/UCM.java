@@ -115,8 +115,8 @@ public class UCM extends ClearcaseImpl {
 			run(new CreateActivity(session, copyArea, message, null, null,
 					new CreateActivity.Listener() {
 						@Override
-						public void newActivity(IHeadlinedUcmActivity activity) {
-							activities.put(message, id[0] = activity.toSelector());
+						public void newActivity(IHeadlinedUcmActivity act) {
+							activities.put(message, id[0] = act.toSelector());
 						}
 					}));
 		} else {
