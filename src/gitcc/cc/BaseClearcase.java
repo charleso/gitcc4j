@@ -2,6 +2,7 @@ package gitcc.cc;
 
 import gitcc.Log;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -14,8 +15,29 @@ import com.ibm.rational.clearcase.remote_core.util.Status;
 public class BaseClearcase {
 
 	protected <T extends AbstractCmd> T run(T update) {
-		update.run();
+		try {
+			update.run();
+		} catch (RuntimeException e) {
+			if (e.getMessage().contains("remature EOF")) {
+				e.printStackTrace();
+				update.getStatus().reset();
+				setRun(update, false);
+				update.run();
+			} else {
+				throw e;
+			}
+		}
 		return update;
+	}
+
+	private void setRun(AbstractCmd update, boolean run) {
+		try {
+			Field field = AbstractCmd.class.getDeclaredField("m_wasRun");
+			field.setAccessible(true);
+			field.set(update, run);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected <T> T log(Class<T> c) {
