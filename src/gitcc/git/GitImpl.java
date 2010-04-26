@@ -175,4 +175,9 @@ public class GitImpl extends Exec implements Git {
 	public void push(String remote) {
 		exec("push", remote);
 	}
+
+	@Override
+	public void symolicRef(String name, String ref) {
+		exec("symbolic-ref", name, ref);
+	}
 }

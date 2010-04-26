@@ -62,4 +62,6 @@ public interface Git {
 	void pullRebase(String remote);
 
 	void push(String remote);
+
+	void symolicRef(String name, String ref);
 }
