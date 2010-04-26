@@ -72,7 +72,6 @@ public class UCM extends ClearcaseImpl {
 
 	@Override
 	public void update() {
-		sync();
 		rebase();
 	}
 
@@ -137,13 +136,13 @@ public class UCM extends ClearcaseImpl {
 		_deliver();
 	}
 
-	private void sync() {
+	@Override
+	public void sync() {
 		run(new SyncViewFromStream(session, new UpdateListener(), integeration,
 				HIJACK_TREATMENT));
 	}
 
 	private void _deliver() {
-		sync();
 		run(new PrepareDeliver(session, integeration,
 				log(PrepareDeliver.Listener.class)));
 		if (!_deliver(DeliverStream.OperationType.DELIVER_START)

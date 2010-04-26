@@ -94,6 +94,8 @@ public class Daemon extends Command {
 						throw new RuntimeException("User not found: "
 								+ c.getAuthor());
 					cc = cc.cloneForUser(user);
+					// Swap back to integration user
+					Daemon.this.cc.sync();
 					super.checkin(l);
 				}
 			}

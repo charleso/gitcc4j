@@ -51,4 +51,6 @@ public interface Clearcase {
 	String getRealComment(String comment);
 
 	void fixFile(CCFile f);
+
+	void sync();
 }

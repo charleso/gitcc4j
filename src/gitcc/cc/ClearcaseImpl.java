@@ -99,6 +99,11 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	}
 
 	@Override
+	public void sync() {
+		// Do nothing
+	}
+
+	@Override
 	public void rebase() {
 		// Do nothing
 	}
