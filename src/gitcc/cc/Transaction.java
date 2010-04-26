@@ -163,6 +163,7 @@ public class Transaction extends Common {
 			File parent = new File(file).getParentFile();
 			checkout(parent.getParentFile().getPath());
 			cc.delete(parent.getPath());
+			checkouts.remove(parent.getPath());
 			deleteEmptyDirs(parent.getPath());
 		}
 	}
