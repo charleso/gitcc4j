@@ -23,7 +23,9 @@ public class Rebase extends Command {
 
 	@Override
 	public void execute() throws Exception {
-		cc.rebase();
+		if (config.isDeliver()) {
+			cc.rebase();
+		}
 		String branch = config.getBranch();
 		boolean normal = branch != null;
 		Date since = normal ? getSince() : null;
