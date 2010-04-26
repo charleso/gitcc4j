@@ -16,7 +16,7 @@ public class Config {
 	private String branch;
 	private int debugLevel = 1;
 	private String[] include = new String[] { "." };
-	private String[] branches = new String[] { "main" };
+	private String[] branches = new String[] {};
 	private String clearcase;
 	private String type;
 	private int ignoreLevel;

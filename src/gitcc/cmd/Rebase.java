@@ -3,6 +3,7 @@ package gitcc.cmd;
 import gitcc.cc.CCCommit;
 import gitcc.cc.CCFile;
 import gitcc.cc.CCHistoryParser;
+import gitcc.cc.CCVersion;
 import gitcc.cc.CCFile.Status;
 import gitcc.util.ExecException;
 import gitcc.util.IOUtils;
@@ -35,7 +36,11 @@ public class Rebase extends Command {
 		// TODO Git fast import
 		if (normal)
 			git.checkout(config.getCC());
+		boolean respectBranches = config.getBranches().length == 0;
 		for (CCCommit c : commits) {
+			if (respectBranches) {
+				checkout(c.getFiles().get(0).getVersion());
+			}
 			handleFiles(c.getFiles(), c.getFiles());
 			git.commit(c, config.getUser(c.getAuthor()));
 		}
@@ -84,6 +89,30 @@ public class Rebase extends Command {
 	protected void doRebase() {
 		git.rebase(config.getCI(), config.getCC());
 		git.rebase(config.getCC(), config.getBranch());
+	}
+
+	private void checkout(CCVersion version) {
+		String branch = version.getBranch();
+		try {
+			git.checkout(branch);
+		} catch (ExecException e) {
+			try {
+				for (String parent : version.getBranches()) {
+					git.checkout(parent);
+				}
+			} catch (ExecException e2) {
+				try {
+					git.checkout(branch);
+				} catch (ExecException e3) {
+					try {
+						git.branch(branch);
+						git.checkout(branch);
+					} catch (ExecException e4) {
+						git.symolicRef("HEAD", "refs/heads/" + branch);
+					}
+				}
+			}
+		}
 	}
 
 	private void handleFiles(List<CCFile> all, List<CCFile> files)
