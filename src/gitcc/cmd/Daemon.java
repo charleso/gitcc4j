@@ -6,6 +6,7 @@ import gitcc.config.User;
 import gitcc.git.GitCommit;
 import gitcc.git.GitUtil;
 import gitcc.util.EmailUtil;
+import gitcc.util.ExecException;
 
 import java.util.Date;
 import java.util.List;
@@ -120,7 +121,12 @@ public class Daemon extends Command {
 					if (sanityCheck(branch, branch_cc)) {
 						git.checkout(branch);
 						git.merge(branch_cc);
-						push();
+						try {
+							push();
+						} catch (ExecException e) {
+							System.out.println(e.getMessage());
+							return;
+						}
 					}
 					git.setConfig(SINCE, Long.toString(since));
 					git.gc();
