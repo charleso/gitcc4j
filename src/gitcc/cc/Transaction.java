@@ -54,7 +54,7 @@ public class Transaction extends Common {
 				stageDir(file);
 				break;
 			case Deleted:
-				stageDir(file);
+				stageDir(file, false);
 				break;
 			case Renamed:
 				stage(s.getOldFile());
@@ -99,10 +99,16 @@ public class Transaction extends Common {
 	}
 
 	private void stageDir(String f) {
+		stageDir(f, true);
+	}
+
+	private void stageDir(String f, boolean add) {
 		File dir = new File(f).getParentFile();
-		while (dir != null && !cc.exists(dir.getPath())) {
-			dirs.add(dir.getPath());
-			dir = dir.getParentFile();
+		if (add) {
+			while (dir != null && !cc.exists(dir.getPath())) {
+				dirs.add(dir.getPath());
+				dir = dir.getParentFile();
+			}
 		}
 		checkout(dir == null ? "." : dir.getPath());
 	}
