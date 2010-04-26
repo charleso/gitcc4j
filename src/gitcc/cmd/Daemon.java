@@ -101,9 +101,17 @@ public class Daemon extends Command {
 			}
 
 			@Override
-			protected void makeBaseline() {
-				// TODO Permission problems
-				Daemon.this.cc.makeBaseline();
+			protected void deliver() {
+				for (int i = 0; i < 2; i++) {
+					try {
+						super.deliver();
+						return;
+					} catch (RuntimeException e) {
+						if (i == 1)
+							throw e;
+						Daemon.this.cc.rebase();
+					}
+				}
 			}
 		});
 	}

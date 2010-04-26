@@ -33,9 +33,13 @@ public class Checkin extends Command {
 			git.branchForce(config.getCI(), c.getId());
 		}
 		if (count > 0 && config.isDeliver()) {
-			cc.deliver();
-			makeBaseline();
+			deliver();
+			cc.makeBaseline();
 		}
+	}
+
+	protected void deliver() {
+		cc.deliver();
 	}
 
 	private int checkin(GitCommit c, int count) {
@@ -48,9 +52,5 @@ public class Checkin extends Command {
 			count++;
 		}
 		return count;
-	}
-
-	protected void makeBaseline() {
-		cc.makeBaseline();
 	}
 }
