@@ -8,6 +8,8 @@ import gitcc.git.GitUtil;
 import gitcc.util.EmailUtil;
 import gitcc.util.ExecException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -65,6 +67,8 @@ public class Daemon extends Command {
 	}
 
 	protected void singlePass() throws Exception {
+		if (getDeliverLock().exists())
+			throw new RuntimeException("Deliver in progress.");
 		pull();
 		if (!sanityCheck(config.getCC(), config.getBranch())) {
 			String error = "Repository is in a bad state. Wake me up when you fix it.";
@@ -102,9 +106,16 @@ public class Daemon extends Command {
 
 			@Override
 			protected void deliver() {
+				File file = getDeliverLock();
+				try {
+					file.createNewFile();
+				} catch (IOException e1) {
+					throw new RuntimeException(e1);
+				}
 				for (int i = 0; i < 2; i++) {
 					try {
 						super.deliver();
+						file.delete();
 						return;
 					} catch (RuntimeException e) {
 						if (i == 1)
@@ -191,5 +202,9 @@ public class Daemon extends Command {
 		init(cmd);
 		cmd.init();
 		cmd.execute();
+	}
+
+	private File getDeliverLock() {
+		return new File(git.getRoot(), ".git/deliver");
 	}
 }
