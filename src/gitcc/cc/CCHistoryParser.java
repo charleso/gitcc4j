@@ -32,12 +32,12 @@ public class CCHistoryParser {
 	}
 
 	private void parse(String history, Collection<CCCommit> commits, String[] i) {
-		Set<String> includes = new HashSet<String>(Arrays.asList(i));
+		Set<String> inc = new HashSet<String>(Arrays.asList(i));
 		for (String line : history.split(SEP)) {
 			CCCommit commit = _parse(line);
 			if (commit != null) {
 				CCVersion version = commit.getFiles().get(0).getVersion();
-				if (includes.contains(version.getBranch())) {
+				if (inc.isEmpty() || inc.contains(version.getBranch())) {
 					commits.add(commit);
 				}
 			}
