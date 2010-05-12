@@ -1,6 +1,7 @@
 package gitcc.cc;
 
 import gitcc.Log;
+import gitcc.ProxyHelper;
 import gitcc.config.Config;
 import gitcc.config.User;
 
@@ -48,6 +49,7 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 
 	@Override
 	public void setConfig(Config config) throws Exception {
+		ProxyHelper.initProxy();
 		this.config = config;
 		String url = new URL(new URL(config.getUrl()), RPC_PATH).toString();
 		session = new Session(url, new Credentials(config));

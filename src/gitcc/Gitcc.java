@@ -25,7 +25,6 @@ public class Gitcc {
 			Rebase.class, Reset.class, Daemon.class, Update.class, Import.class };
 
 	public static void main(String[] args) throws Exception {
-		ProxyHelper.initProxy();
 		if (args.length == 0) {
 			help();
 		}
