@@ -7,6 +7,7 @@ import gitcc.cc.CCFile.Status;
 import gitcc.config.Config;
 import gitcc.config.User;
 import gitcc.exec.Exec;
+import gitcc.util.ExecException;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +51,12 @@ public class ClearcaseExec extends Exec implements Clearcase {
 
 	@Override
 	public List<CCFile> diffPred(CCFile file) {
-		String diff = exec("diff", "-diff_format", "-pred", file.toString());
+		String diff;
+		try {
+			diff = exec("diff", "-diff_format", "-pred", file.toString());
+		} catch (ExecException e) {
+			diff = e.getMessage();
+		}
 		return diff(file.getFile(), diff);
 	}
 
