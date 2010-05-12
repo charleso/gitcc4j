@@ -10,6 +10,7 @@ import gitcc.util.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -240,8 +241,12 @@ public class Rebase extends Command {
 					recurse(file, new File(dest, file.getName()));
 				}
 			} else {
-				IOUtils.copy(new FileInputStream(src), new FileOutputStream(
-						dest));
+				try {
+					IOUtils.copy(new FileInputStream(src),
+							new FileOutputStream(dest));
+				} catch (FileNotFoundException e) {
+					System.out.println(e.getMessage());
+				}
 			}
 		}
 
