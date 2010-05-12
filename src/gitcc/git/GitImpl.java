@@ -45,7 +45,7 @@ public class GitImpl extends Exec implements Git {
 				"GIT_COMMITTER_EMAIL=" + email, };
 		try {
 			String message = commit.getMessage();
-			message = !message.isEmpty() ? message : EMPTY;
+			message = !message.trim().isEmpty() ? message : EMPTY;
 			exec(env, "commit", "-m", message);
 		} catch (ExecException e) {
 			if (e.getMessage().contains("nothing to commit"))
