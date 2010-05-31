@@ -28,7 +28,8 @@ public class Config {
 	private String stream;
 	private String remote;
 	private String cleartool = "cleartool";
-
+	private boolean merge;
+	
 	private String smtp;
 	private String sender;
 	private String[] recipients;
@@ -255,5 +256,13 @@ public class Config {
 
 	public void setCleartool(String cleartool) {
 		this.cleartool = cleartool;
+	}
+
+	public void setMerge(boolean merge) {
+		this.merge = merge;
+	}
+
+	public boolean isMerge() {
+		return merge;
 	}
 }

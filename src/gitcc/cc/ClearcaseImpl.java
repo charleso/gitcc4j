@@ -258,6 +258,11 @@ public class ClearcaseImpl extends BaseClearcase implements Clearcase {
 	}
 
 	@Override
+	public String describe(CCFile file) {
+		throw new RuntimeException("Not supported");
+	}
+	
+	@Override
 	public Clearcase cloneForUser(User user) throws Exception {
 		if (user == null || user.getPassword() == null)
 			return this;

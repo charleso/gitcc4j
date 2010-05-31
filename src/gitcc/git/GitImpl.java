@@ -72,6 +72,12 @@ public class GitImpl extends Exec implements Git {
 	}
 
 	@Override
+	public List<GitCommit> logAllDateOrderOne() {
+		return util.parseLog(exec("log", "-z", "--all", "--date-order", "-n",
+				"1", "--pretty=format:" + LOG_FORMAT));
+	}
+
+	@Override
 	public List<FileStatus> getStatuses(GitCommit c) {
 		String id = c.getId();
 		String range = id + "^.." + id;
@@ -134,6 +140,11 @@ public class GitImpl extends Exec implements Git {
 	@Override
 	public void merge(String remote) {
 		exec("merge", remote);
+	}
+
+	@Override
+	public void mergeStrategyOurs(String branch) {
+		exec("merge", "--strategy=ours", "--no-commit", branch);
 	}
 
 	@Override

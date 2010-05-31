@@ -136,6 +136,11 @@ public class ClearcaseExec extends Exec implements Clearcase {
 		exec("update", ".");
 	}
 
+	@Override
+	public String describe(CCFile file) {
+		return exec("describe", file.toString());
+	}
+
 	// UCM methods
 
 	@Override

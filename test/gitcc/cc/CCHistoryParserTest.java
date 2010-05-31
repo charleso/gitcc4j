@@ -37,7 +37,7 @@ public class CCHistoryParserTest extends TestCase {
 
 	private Collection<CCCommit> parse(String s, int expected,
 			String... branches) {
-		Collection<CCCommit> commits = new CCHistoryParser().parse(s, branches);
+		Collection<CCCommit> commits = new CCHistoryParser().parse(s, branches, new String[0]);
 		assertEquals(expected, commits.size());
 		return commits;
 	}

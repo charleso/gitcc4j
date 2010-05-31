@@ -30,23 +30,30 @@ public class CCHistoryParser {
 
 	// TODO We can/should have better heuristics here
 	// ie Check a few commits back just in case...
-	public Collection<CCCommit> parse(String history, String[] includes) {
+	public Collection<CCCommit> parse(String history) {
+		return parse(history, new String[0], new String[0]);
+	}
+
+	public Collection<CCCommit> parse(String history, String[] branches,
+			String[] includes) {
 		Collection<CCCommit> commits = new TreeSet<CCCommit>(
 				new CommitComparator());
-		parse(history, commits, includes);
+		parse(history, commits);
+		if (branches.length > 0) {
+			filterBranches(commits, branches);
+		}
+		if (includes.length > 0 && !includes[0].equals(".")) {
+			filterIncludes(commits, includes);
+		}
 		filter(commits);
 		return commits;
 	}
 
-	private void parse(String history, Collection<CCCommit> commits, String[] i) {
-		Set<String> inc = new HashSet<String>(Arrays.asList(i));
+	private void parse(String history, Collection<CCCommit> commits) {
 		for (String line : history.split(SEP)) {
 			CCCommit commit = _parse(line);
 			if (commit != null) {
-				CCVersion version = commit.getFiles().get(0).getVersion();
-				if (inc.isEmpty() || inc.contains(version.getBranch())) {
-					commits.add(commit);
-				}
+				commits.add(commit);
 			}
 		}
 	}
@@ -81,8 +88,9 @@ public class CCHistoryParser {
 		CCCommit last = null;
 		for (Iterator<CCCommit> i = commits.iterator(); i.hasNext();) {
 			CCCommit next = i.next();
-			if (last != null && equals(last, next)) {
-				last.getFiles().add(next.getFiles().get(0));
+			CCFile newFile = next.getFiles().get(0);
+			if (last != null && equals(last, next) && !contains(last, newFile)) {
+				last.getFiles().add(newFile);
 				last.setDate(next.getDate());
 				i.remove();
 			} else {
@@ -91,10 +99,48 @@ public class CCHistoryParser {
 		}
 	}
 
+	private boolean contains(CCCommit last, CCFile newFile) {
+		for (CCFile file : last.getFiles()) {
+			if (file.getFile().equals(newFile.getFile())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void filterBranches(Collection<CCCommit> commits, String[] i) {
+		Set<String> inc = new HashSet<String>(Arrays.asList(i));
+		for (Iterator<CCCommit> j = commits.iterator(); j.hasNext();) {
+			CCVersion version = j.next().getFiles().get(0).getVersion();
+			if (!inc.contains(version.getBranch())) {
+				j.remove();
+			}
+		}
+	}
+
+	private void filterIncludes(Collection<CCCommit> commits, String[] i) {
+		for (Iterator<CCCommit> j = commits.iterator(); j.hasNext();) {
+			CCCommit commit = j.next();
+			for (Iterator<CCFile> k = commit.getFiles().iterator(); k.hasNext();) {
+				String file = k.next().getFile();
+				for (String f : i) {
+					if (!file.equals(f) && !file.startsWith(f + "/")) {
+						k.remove();
+					}
+				}
+			}
+			if (commit.getFiles().isEmpty()) {
+				j.remove();
+			}
+		}
+	}
+
 	private boolean equals(CCCommit last, CCCommit next) {
 		return getSubject(last.getMessage()).equals(
 				getSubject(next.getMessage()))
-				&& last.getAuthor().equals(next.getAuthor());
+				&& last.getAuthor().equals(next.getAuthor())
+				&& last.getFiles().get(0).getVersion().getBranch().equals(
+						next.getFiles().get(0).getVersion().getBranch());
 	}
 
 	private final class CommitComparator implements Comparator<CCCommit> {

@@ -23,6 +23,8 @@ public interface Git {
 
 	List<GitCommit> log(String treeish);
 
+	List<GitCommit> logAllDateOrderOne();
+
 	List<FileStatus> getStatuses(GitCommit c);
 
 	byte[] catFile(String sha, String file);
@@ -52,6 +54,8 @@ public interface Git {
 	String getConfig(String name);
 
 	void merge(String remote);
+
+	void mergeStrategyOurs(String branch);
 
 	void gc();
 

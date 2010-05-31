@@ -4,7 +4,9 @@ import gitcc.cc.CCCommit;
 import gitcc.cc.CCFile;
 import gitcc.cc.CCHistoryParser;
 import gitcc.cc.CCVersion;
+import gitcc.cc.DescribeUtil;
 import gitcc.cc.CCFile.Status;
+import gitcc.git.GitCommit;
 import gitcc.util.ExecException;
 import gitcc.util.IOUtils;
 
@@ -42,6 +44,10 @@ public class Rebase extends Command {
 			if (respectBranches) {
 				checkout(c.getFiles().get(0).getVersion());
 			}
+			// Do the merge first so we can set the commit message after
+			if (config.isMerge()) {
+				handleMerge(c);
+			}
 			handleFiles(c.getFiles(), c.getFiles());
 			git.commit(c, config.getUser(c.getAuthor()));
 		}
@@ -61,7 +67,7 @@ public class Rebase extends Command {
 
 	protected Collection<CCCommit> parseHistory(String lsh) {
 		Collection<CCCommit> commits = histParser.parse(lsh, config
-				.getBranches());
+				.getBranches(), config.getInclude());
 		for (CCCommit commit : commits) {
 			for (CCFile f : commit.getFiles()) {
 				cc.fixFile(f);
@@ -84,6 +90,11 @@ public class Rebase extends Command {
 	}
 
 	protected Date getSince() {
+		if (config.getBranch().length() == 0) {
+			for (GitCommit commit : git.logAllDateOrderOne()) {
+				return git.getCommitDate(commit.getId());
+			}
+		}
 		return git.getCommitDate(config.getCC());
 	}
 
@@ -252,7 +263,29 @@ public class Rebase extends Command {
 
 		@Override
 		public void add(String file) throws Exception {
-			git.add(file);
+			try {
+				git.add(file);
+			} catch (ExecException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+
+	private void handleMerge(CCCommit commit) {
+		String desc = cc.describe(commit.getFiles().get(0));
+		CCFile merge = DescribeUtil.getMerge(desc);
+		if (merge == null)
+			return;
+		String branch = merge.getVersion().getBranch();
+		try {
+			git.mergeStrategyOurs(branch);
+		} catch (ExecException e) {
+			// Can happen if they've manually drawn the merge arrow
+			if (e.getMessage().contains("does not point to a commit")) {
+				System.out.println(e.getMessage());
+				return;
+			}
+			throw e;
 		}
 	}
 }

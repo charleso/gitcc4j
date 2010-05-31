@@ -54,4 +54,6 @@ public interface Clearcase {
 	void fixFile(CCFile f);
 
 	void sync();
+
+	String describe(CCFile file);
 }
