@@ -13,12 +13,14 @@ public class ClearcaseExecTest extends TestCase {
 		String end = " --11-05T14:40 userid\n";
 		String diff = "-----[ added ]-----                        \n"
 				+ "> b.x -> blah                                  \n"
+				+ ">  space " + end + "                            \n"
 				+ "> lib/" + end
 				+ "-----[ deleted ]-----                          \n"
 				+ "< a.x " + end;
 		List<CCFile> files = cc.diff("b", diff);
-		check(files.get(0), "b/lib", Status.Added);
-		check(files.get(1), "b/a.x", Status.Deleted);
+		check(files.get(0), "b/ space", Status.Added);
+		check(files.get(1), "b/lib", Status.Added);
+		check(files.get(2), "b/a.x", Status.Deleted);
 	}
 
 	private void check(CCFile file, String name, Status status) {

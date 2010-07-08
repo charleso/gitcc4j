@@ -66,7 +66,7 @@ public class ClearcaseExec extends Exec implements Clearcase {
 		for (String line : diff.split("\n")) {
 			if (line.contains(" -> "))
 				continue;
-			int i = Math.max(line.indexOf("  "), line.indexOf(sep + " "));
+			int i = Math.max(line.indexOf("  ", 2), line.indexOf(sep + " "));
 			if (i < 0)
 				continue;
 			String file = dir + sep + line.substring(2, i);
