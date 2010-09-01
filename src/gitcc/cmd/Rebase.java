@@ -72,11 +72,17 @@ public class Rebase extends Command {
 			for (CCFile f : commit.getFiles()) {
 				cc.fixFile(f);
 			}
+		}
+		loadActivities(commits);
+		return commits;
+	}
+
+	protected void loadActivities(Collection<CCCommit> commits) {
+		for (CCCommit commit : commits) {
 			if (!commit.getMessage().isEmpty()) {
 				commit.setMessage(cc.getRealComment(commit.getMessage()));
 			}
 		}
-		return commits;
 	}
 
 	private void backupHistory(String lsh) {
